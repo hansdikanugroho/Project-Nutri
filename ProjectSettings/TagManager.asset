@@ -2,18 +2,18 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Stamp
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Kantor
+  - Asap
+  - City
   - 
   - 
   - 
@@ -38,6 +38,23 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 1809443873
+    locked: 0
+  - name: Awan
+    uniqueID: 1341892527
+    locked: 0
+  - name: Kota
+    uniqueID: 3404619017
+    locked: 0
+  - name: Kantor
+    uniqueID: 4247468055
+    locked: 0
+  - name: UI
+    uniqueID: 1209338747
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
+  m_RenderingLayers:
+  - Default
