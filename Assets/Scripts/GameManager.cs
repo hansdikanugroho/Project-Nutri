@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Day Cycle System")]
     public int currentDay = 1;
+    [HideInInspector] // Disembunyikan karena sekarang otomatis ngikutin jumlah database
     public int customersPerDay = 5; 
     private int customersServedToday = 0;
     
@@ -86,7 +87,16 @@ public class GameManager : MonoBehaviour
         customersServedToday = 0;
         if (dayReportPanel != null) dayReportPanel.SetActive(false);
         
+        // Sinkronisasi target pelanggan harian dengan jumlah database
+        if (CustomerManager.Instance != null && CustomerManager.Instance.customerDatabase != null)
+        {
+            customersPerDay = CustomerManager.Instance.customerDatabase.Length;
+        }
+        
         Debug.Log("Hari ke-" + currentDay + " Dimulai!");
+        
+        // Generate antrian harian dulu baru panggil pelanggan
+        CustomerManager.Instance.GenerateDailyQueue();
         CustomerManager.Instance.StartCustomerSequence();
     }
 
@@ -234,34 +244,17 @@ public class GameManager : MonoBehaviour
         reputationBarRect.anchoredPosition = originalBarPos;
     }
 
-    // --------------------------------------------------------
-    // FUNGSI KONSEKUENSI FUNGUS (RANDOM EVENT)
-    // --------------------------------------------------------
-    
-    // Dipanggil oleh Fungus jika pemain MENERIMA suap
     public void OnBribeAccepted()
     {
         Debug.LogWarning("Suap Diterima! Reputasi Anda turun sebagai bentuk risiko korupsi.");
-        
-        // Mengurangi reputasi secara langsung (akan memicu efek getar dan cek zona)
         UpdateReputation(-20); 
-        
-        // (Opsional) Jika Anda punya variabel uang, tambahkan di sini:
-        // totalUang += 500; 
-
-        // Lanjutkan permainan dengan memunculkan kertas di meja
         CustomerManager.Instance.ShowPaperAndStartTimer();
     }
 
-    // Dipanggil oleh Fungus jika pemain MENOLAK suap
     public void OnBribeRejected()
     {
         Debug.Log("Suap Ditolak! Anda mempertahankan integritas pekerjaan Anda.");
-        
-        // Memberikan sedikit bonus reputasi karena jujur
         UpdateReputation(5); 
-
-        // Lanjutkan permainan dengan memunculkan kertas di meja
         CustomerManager.Instance.ShowPaperAndStartTimer();
     }
 }

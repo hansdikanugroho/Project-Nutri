@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
-using Fungus; // Wajib untuk memanggil Flowchart
+using System.Collections.Generic;
+using Fungus; 
 
 public class CustomerManager : MonoBehaviour
 {
@@ -10,6 +11,11 @@ public class CustomerManager : MonoBehaviour
 
     [Header("Database")]
     public CustomerData[] customerDatabase;
+
+    [Header("Time & Queue System")]
+    public DayNightController timeController; 
+    private List<CustomerData> dailyCustomerQueue = new List<CustomerData>();
+    private int totalCustomersToday;
 
     private CustomerData currentCustomer;
     private ProductData currentProduct;
@@ -31,82 +37,90 @@ public class CustomerManager : MonoBehaviour
 
     void Awake() => Instance = this;
 
+    // Pastikan fungsi ini dipanggil sekali saat HARI BARU dimulai (misal dari GameManager.StartNewDay)
+    public void GenerateDailyQueue()
+    {
+        dailyCustomerQueue.Clear();
+        totalCustomersToday = customerDatabase.Length; // Langsung baca dari jumlah Database di Inspector
+
+        // Memasukkan semua customer ke dalam antrian hari ini
+        for (int i = 0; i < totalCustomersToday; i++)
+        {
+            dailyCustomerQueue.Add(customerDatabase[i]);
+        }
+    }
+
     public void StartCustomerSequence()
     {
         StartCoroutine(SpawnSequence());
     }
 
-    // --------------------------------------------------------
-    // FASE 1: PELANGGAN DATANG & CEK EVENT FUNGUS
-    // --------------------------------------------------------
     private IEnumerator SpawnSequence()
     {
-        // Bersihkan meja dari sisa kertas sebelumnya
         paperContainer.SetActive(false);
         ResetFadeColors();
 
-        if (customerDatabase.Length > 0)
+        if (dailyCustomerQueue.Count > 0)
         {
-            // 1. Gacha Pelanggan
-            currentCustomer = customerDatabase[Random.Range(0, customerDatabase.Length)];
+            // LOGIKA HITUNG URUTAN: 
+            // Kalau database ada 2, pas orang pertama dipanggil, count jadi 0 (Pagi)
+            // Pas orang kedua, count jadi 1 (Siang)
+            int currentCustomerIndex = totalCustomersToday - dailyCustomerQueue.Count;
+
+            if (timeController != null)
+            {
+                timeController.SetTimePhase(currentCustomerIndex);
+            }
+
+            currentCustomer = dailyCustomerQueue[0];
+            dailyCustomerQueue.RemoveAt(0); 
             
             customerRenderer.sprite = currentCustomer.spriteNetral;
-            customerObject.SetActive(true); // Pastikan pelanggan menyala
+            customerObject.SetActive(true); 
 
-            // Waktu tunggu agar pelanggan terlihat bersiap di meja
             yield return new WaitForSeconds(3f); 
 
-            // 2. SISTEM RANDOM EVENT FUNGUS (Contoh: Percobaan Suap)
-            // Cek apakah pelanggan ini memiliki event dan apakah probabilitasnya tembus
             if (currentCustomer.canTriggerEvent && Random.value <= currentCustomer.eventProbability)
             {
-                Debug.Log("Random Event Terpicu: " + currentCustomer.fungusMessageToTrigger);
-                
-                // Kirim pesan ke Flowchart Fungus untuk memulai dialog
                 Flowchart.BroadcastFungusMessage(currentCustomer.fungusMessageToTrigger);
-                
-                // Hentikan proses kemunculan kertas di C# karena Fungus mengambil alih layar
                 yield break; 
             }
 
-            // 3. Jika tidak ada event Fungus, langsung keluarkan kertas
             ShowPaperAndStartTimer();
         }
         else
         {
-            Debug.LogError("Database Pelanggan kosong!");
+            // Jika antrian habis, lapor ke GameManager untuk Akhiri Hari
+            Debug.Log("Semua pelanggan di database sudah dilayani. Hari berakhir.");
+            if (GameManager.Instance != null)
+            {
+                // Panggil fungsi show panel result lu di sini
+                // GameManager.Instance.EndDay(); 
+            }
         }
     }
 
-    // Fungsi ini dipisah agar bisa dipanggil kembali oleh Fungus (Invoke Method)
-    // saat dialog selesai atau pemain menolak/menerima suap.
     public void ShowPaperAndStartTimer()
     {
         if (currentCustomer.possibleProducts.Length > 0)
         {
             currentProduct = currentCustomer.possibleProducts[Random.Range(0, currentCustomer.possibleProducts.Length)];
             
-            // Masukkan data ke UI Kertas
             namaProdukText.text = "Pengaju: " + currentProduct.namaProduk;
             gulaText.text = "Gula: " + currentProduct.gula + "g";
             garamText.text = "Garam: " + currentProduct.garam + "g";
             lemakText.text = "Lemak: " + currentProduct.lemak + "g";
         }
 
-        // Nyalakan Kertas dan Teks secara eksplisit
         paperContainer.SetActive(true);
         namaProdukText.gameObject.SetActive(true);
         gulaText.gameObject.SetActive(true);
         garamText.gameObject.SetActive(true);
         lemakText.gameObject.SetActive(true);
         
-        // Lapor ke GameManager bahwa game bisa dilanjutkan (timer mulai)
         GameManager.Instance.OnCustomerReady(currentProduct);
     }
 
-    // --------------------------------------------------------
-    // FASE 2: HASIL KEPUTUSAN & FADE OUT
-    // --------------------------------------------------------
     public void EndCustomerSequence(bool isHappy)
     {
         StartCoroutine(EndSequence(isHappy));
@@ -114,17 +128,15 @@ public class CustomerManager : MonoBehaviour
 
     private IEnumerator EndSequence(bool isHappy)
     {
-        // Ubah ekspresi berdasarkan keputusan benar/salah
         customerRenderer.sprite = isHappy ? currentCustomer.spriteSenang : currentCustomer.spriteMarah;
         
-        yield return new WaitForSeconds(1.5f); // Jeda sebelum memudar
+        yield return new WaitForSeconds(1.5f); 
 
         float fadeDuration = 1f;
         float timeElapsed = 0f;
         Color pColor = paperSprite.color;
         Color cColor = customerRenderer.color;
 
-        // Efek memudar secara perlahan
         while (timeElapsed < fadeDuration)
         {
             timeElapsed += Time.deltaTime;
@@ -140,7 +152,6 @@ public class CustomerManager : MonoBehaviour
             yield return null;
         }
 
-        // Matikan objek secara spesifik dan total
         customerObject.SetActive(false); 
         paperContainer.SetActive(false); 
         
@@ -149,7 +160,7 @@ public class CustomerManager : MonoBehaviour
         garamText.gameObject.SetActive(false);
         lemakText.gameObject.SetActive(false);
 
-        // Lapor ke GameManager bahwa meja sudah kosong dan siap untuk diproses
+        // Setelah bersih-bersih, suruh GameManager memanggil pelanggan berikutnya
         GameManager.Instance.CheckDayProgress();
     }
 
