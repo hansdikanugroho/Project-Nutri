@@ -497,6 +497,8 @@ MonoBehaviour:
   customerDatabase:
   - {fileID: 11400000, guid: aac68edbd7e85174fac99c2ee03392ea, type: 2}
   - {fileID: 11400000, guid: cb1768a67b37d1348980a640622ae959, type: 2}
+  - {fileID: 11400000, guid: cb1768a67b37d1348980a640622ae959, type: 2}
+  - {fileID: 11400000, guid: cb1768a67b37d1348980a640622ae959, type: 2}
   timeController: {fileID: 392293692}
   paperContainer: {fileID: 806085720}
   paperSprite: {fileID: 806085722}
@@ -797,6 +799,8 @@ MonoBehaviour:
   stampLevel: 0
   targetPaperArea: {fileID: 334844321}
   snapRadius: 1.5
+  idleSprite: {fileID: 7785669342496006158, guid: d668f7bdb6ef7d342beda84f0a401b33, type: 3}
+  dragSprite: {fileID: -5610121155824500873, guid: 15d0f23802ffb674b8f9d82655240b25, type: 3}
 --- !u!61 &164285586
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1565,6 +1569,11 @@ MonoBehaviour:
   globalLights:
   - {fileID: 631524302}
   freeformLight: {fileID: 1682025650}
+  lampuMalam:
+  - {fileID: 1158705058}
+  - {fileID: 473662792}
+  - {fileID: 1721730963}
+  gloomOverlayCanvas: {fileID: 206423535}
   transitionTime: 2
   pagi:
     globalColor: {r: 0.36078432, g: 0.6392157, b: 0.5058824, a: 1}
@@ -1601,6 +1610,15 @@ MonoBehaviour:
     rayPosition: {x: 0, y: 0, z: 0}
     rayRotation: {x: 0, y: 0, z: 0}
     rayFalloff: 1.75
+    rayFalloffStrength: 0
+  bossEvent:
+    globalColor: {r: 0.90943396, g: 0.19732988, b: 0.19732988, a: 1}
+    globalIntensity: 1.17
+    rayColor: {r: 1, g: 1, b: 1, a: 1}
+    rayIntensity: 1
+    rayPosition: {x: -9.75, y: 3.15, z: 0}
+    rayRotation: {x: 0, y: 0, z: 70}
+    rayFalloff: 1.16
     rayFalloffStrength: 0
 --- !u!4 &392293693
 Transform:
@@ -7516,6 +7534,8 @@ MonoBehaviour:
   stampLevel: 3
   targetPaperArea: {fileID: 334844321}
   snapRadius: 1.5
+  idleSprite: {fileID: 4444084174460226746, guid: fd94bb307c20ec24cb35421fed6b0bb6, type: 3}
+  dragSprite: {fileID: -4559620476116256921, guid: a73b202635ac4914c9e6d42c7c9230fd, type: 3}
 --- !u!61 &651892294
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -19300,6 +19320,8 @@ MonoBehaviour:
   stampLevel: 1
   targetPaperArea: {fileID: 334844321}
   snapRadius: 1.5
+  idleSprite: {fileID: 8658513488024162194, guid: 41e91cd1a54ac4541b269f11ecbf76f3, type: 3}
+  dragSprite: {fileID: 224260439625319653, guid: 9db6f9ada1eee5a4f877aa808e23ef9d, type: 3}
 --- !u!61 &2002619659
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -19454,6 +19476,8 @@ MonoBehaviour:
   stampLevel: 2
   targetPaperArea: {fileID: 334844321}
   snapRadius: 1.5
+  idleSprite: {fileID: 298201449278483224, guid: 896b8c06238f3ca49acf24b93ce53a8b, type: 3}
+  dragSprite: {fileID: 187239945195407983, guid: 935208633a0e7e5488c50ab95ee10614, type: 3}
 --- !u!61 &2076920341
 BoxCollider2D:
   m_ObjectHideFlags: 0
