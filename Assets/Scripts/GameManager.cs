@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     [Header("Game State")]
     public int reputation = 100;
     public int dailyReputationChange = 0;
-    private float customerPatience = 15f; 
+    private float currentCustomerPatience; 
     private float currentTimer;
     
     public bool isProcessing = false; 
@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     [Header("Day Cycle System")]
     public int currentDay = 1;
     public DayConfig[] dayConfigurations; 
-    private int customersPerDay = 5; 
+    private int currentCustomersPerDay;
     private int customersServedToday = 0;
     
     [Header("Day Report UI")]
@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
             currentTimer -= Time.deltaTime;
             
             if(timerSlider != null) 
-                timerSlider.value = currentTimer / customerPatience;
+                timerSlider.value = currentTimer / currentCustomerPatience;
             
             if (currentTimer <= 0)
             {
@@ -96,25 +96,23 @@ public class GameManager : MonoBehaviour
         if (dayReportPanel != null) dayReportPanel.SetActive(false);
         if (spPopupPanel != null) spPopupPanel.SetActive(false);
         
-        // Loading konfigurasi hari ini; kalau index di luar array, pakai index terakhir (endless mode)
         if (dayConfigurations != null && dayConfigurations.Length > 0)
         {
-            int dayIndex = Mathf.Clamp(currentDay - 1, 0, dayConfigurations.Length - 1);
-            DayConfig activeConfig = dayConfigurations[dayIndex];
+            int configIndex = Mathf.Clamp(currentDay - 1, 0, dayConfigurations.Length - 1);
+            DayConfig currentConfig = dayConfigurations[configIndex];
 
-            customersPerDay = activeConfig.targetCustomers;
-            customerPatience = activeConfig.customerPatience;
+            currentCustomersPerDay = currentConfig.targetCustomers;
+            currentCustomerPatience = currentConfig.customerPatience;
 
-            if (activeConfig.dayCustomerDatabase != null && activeConfig.dayCustomerDatabase.Length > 0)
+            if (currentConfig.dayCustomerDatabase != null && currentConfig.dayCustomerDatabase.Length > 0)
             {
                 if (CustomerManager.Instance != null)
-                    CustomerManager.Instance.SetCustomerDatabase(activeConfig.dayCustomerDatabase);
+                    CustomerManager.Instance.SetTodayCustomers(currentConfig.dayCustomerDatabase);
             }
         }
         
         Debug.Log("Hari ke-" + currentDay + " Dimulai!");
         
-        // Generate antrian harian dulu baru panggil pelanggan
         CustomerManager.Instance.GenerateDailyQueue();
         CustomerManager.Instance.StartCustomerSequence();
     }
@@ -124,7 +122,7 @@ public class GameManager : MonoBehaviour
         activeProduct = productData;
         sudahDiCap = false;
         isProcessing = true;
-        currentTimer = customerPatience;
+        currentTimer = currentCustomerPatience;
     }
 
     private void UpdateBarColor()
@@ -172,7 +170,7 @@ public class GameManager : MonoBehaviour
 
         customersServedToday++;
 
-        if (customersServedToday >= customersPerDay)
+        if (customersServedToday >= currentCustomersPerDay)
         {
             ProcessEndOfDay();
         }

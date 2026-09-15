@@ -9,8 +9,7 @@ public class CustomerManager : MonoBehaviour
 {
     public static CustomerManager Instance;
 
-    [Header("Database")]
-    public CustomerData[] customerDatabase;
+    private CustomerData[] todayCustomers;
 
     [Header("Time & Queue System")]
     public DayNightController timeController; 
@@ -46,22 +45,20 @@ public class CustomerManager : MonoBehaviour
         if (foodObject != null) foodObject.SetActive(false);
     }
 
-    // Pastikan fungsi ini dipanggil sekali saat HARI BARU dimulai (misal dari GameManager.StartNewDay)
-    public void SetCustomerDatabase(CustomerData[] newDatabase)
+    public void SetTodayCustomers(CustomerData[] customersForToday)
     {
-        if (newDatabase == null || newDatabase.Length == 0) return;
-        customerDatabase = newDatabase;
+        if (customersForToday == null || customersForToday.Length == 0) return;
+        todayCustomers = customersForToday;
     }
 
     public void GenerateDailyQueue()
     {
         dailyCustomerQueue.Clear();
-        totalCustomersToday = customerDatabase.Length; // Langsung baca dari jumlah Database di Inspector
+        totalCustomersToday = todayCustomers.Length;
 
-        // Memasukkan semua customer ke dalam antrian hari ini
         for (int i = 0; i < totalCustomersToday; i++)
         {
-            dailyCustomerQueue.Add(customerDatabase[i]);
+            dailyCustomerQueue.Add(todayCustomers[i]);
         }
     }
 
