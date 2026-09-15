@@ -38,6 +38,8 @@ public class GameManager : MonoBehaviour
     public GameObject spPopupPanel;
     public TextMeshProUGUI spTitleText;
     public TextMeshProUGUI spMessageText;
+    private Coroutine spPopupTimer;
+    public float spPopupDuration = 5f;
 
     [Header("Reputation Bar System")]
     public int maxReputation = 100;
@@ -60,6 +62,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        if (spPopupPanel == null) AutoResolveSPPopupRefs();
+
         if (nextDayButton != null)
         {
             nextDayButton.onClick.AddListener(OnNextDayButtonClicked);
@@ -77,6 +81,42 @@ public class GameManager : MonoBehaviour
             UpdateBarColor();
         }
         StartNewDay();
+    }
+
+    private void AutoResolveSPPopupRefs()
+    {
+        Transform[] allTransforms = Resources.FindObjectsOfTypeAll<Transform>();
+        foreach (Transform t in allTransforms)
+        {
+            if (t.name == "Sp Kertas")
+            {
+                spPopupPanel = t.gameObject;
+                break;
+            }
+        }
+
+        if (spPopupPanel != null)
+        {
+            TextMeshProUGUI[] texts = spPopupPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+            if (texts.Length > 0) spTitleText = texts[0];
+            if (texts.Length > 1) spMessageText = texts[1];
+            Debug.LogWarning("[DEBUG] Auto-resolved SP popup references from scene (spPopupPanel was unassigned).");
+        }
+        else
+        {
+            Debug.LogWarning("[DEBUG] Could NOT find 'Sp Kertas' in the scene. SP popup will not appear until it is assigned in the Inspector.");
+        }
+    }
+
+    private bool HasZeroScaledAncestor(Transform current)
+    {
+        Transform t = current.parent;
+        while (t != null)
+        {
+            if (t.localScale == Vector3.zero) return true;
+            t = t.parent;
+        }
+        return false;
     }
 
     void Update()
@@ -192,6 +232,7 @@ public class GameManager : MonoBehaviour
     {
         reputation += dailyReputationChange;
         reputation = Mathf.Clamp(reputation, 0, maxReputation); 
+        Debug.Log($"[DEBUG EOD] Final Reputation: {reputation} | Current SP Level: {currentSPLevel}"); 
 
         if(reputationSlider != null)
         {
@@ -206,49 +247,110 @@ public class GameManager : MonoBehaviour
         }
 
         if (reputation <= 0)
+        {
             currentSPLevel = 3;
-        else if (reputation <= 33)
-            currentSPLevel = 2;
-        else if (reputation <= 66)
+            Debug.Log("[DEBUG EOD] Triggered FIRED!");
+        }
+        else if (reputation > 33 && reputation <= 66 && currentSPLevel < 1)
+        {
             currentSPLevel = 1;
+            Debug.Log("[DEBUG EOD] Triggered SP 1!");
+        }
+        else if (reputation <= 33)
+        {
+            currentSPLevel = 2;
+            Debug.Log("[DEBUG EOD] Triggered SP 2!");
+        }
         else
+        {
             currentSPLevel = 0;
+            Debug.Log("[DEBUG EOD] Triggered SAFE ZONE.");
+        }
 
         Debug.Log("Reputasi akhir hari ke-" + currentDay + ": " + reputation + " (Perubahan: " + dailyReputationChange + ")");
 
-        if (currentSPLevel >= 1 && spPopupPanel != null)
+        if (currentSPLevel >= 1)
         {
-            if (spTitleText != null)
+            if (spPopupPanel != null)
             {
-                if (currentSPLevel == 3)
-                    spTitleText.text = "GAME OVER!";
-                else if (currentSPLevel == 2)
-                    spTitleText.text = "SP 2 - Kritis!";
-                else
-                    spTitleText.text = "SP 1 - Peringatan!";
-            }
+                if (spTitleText != null)
+                {
+                    if (currentSPLevel == 3)
+                        spTitleText.text = "GAME OVER!";
+                    else if (currentSPLevel == 2)
+                        spTitleText.text = "SP 2 - Kritis!";
+                    else
+                        spTitleText.text = "SP 1 - Peringatan!";
+                }
 
-            if (spMessageText != null)
+                if (spMessageText != null)
+                {
+                    if (currentSPLevel == 3)
+                        spMessageText.text = "Reputasi Anda habis. Anda Dipecat!";
+                    else if (currentSPLevel == 2)
+                        spMessageText.text = "Reputasi Anda masuk Bar 1 (Kritis). Waspada!";
+                    else
+                        spMessageText.text = "Reputasi Anda turun ke Bar 2. Segera perbaiki!";
+                }
+
+                spPopupPanel.transform.localScale = Vector3.one;
+                spPopupPanel.transform.SetAsLastSibling();
+                spPopupPanel.SetActive(true);
+
+                if (!spPopupPanel.activeInHierarchy)
+                {
+                    Debug.LogWarning("[DEBUG EOD] SP popup is ACTIVE but INVISIBLE - its parent Canvas or ancestor is inactive. Check the popup's parent in the hierarchy.");
+                }
+
+                if (HasZeroScaledAncestor(spPopupPanel.transform))
+                {
+                    if (dayReportPanel != null)
+                    {
+                        spPopupPanel.transform.SetParent(dayReportPanel.transform, false);
+                        spPopupPanel.transform.localScale = Vector3.one;
+                        spPopupPanel.transform.localPosition = Vector3.zero;
+                        Debug.LogWarning("[DEBUG EOD] SP popup had a zero-scale ancestor - reparented it onto the Day Report canvas to make it visible.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[DEBUG EOD] SP popup has a zero-scale ancestor and dayReportPanel is NULL - cannot auto-reparent. Fix the root canvas scale in the scene.");
+                    }
+                }
+
+                if (spPopupTimer != null) StopCoroutine(spPopupTimer);
+                spPopupTimer = StartCoroutine(SPPopupAutoClose());
+            }
+            else
             {
-                if (currentSPLevel == 3)
-                    spMessageText.text = "Reputasi Anda habis. Anda Dipecat!";
-                else if (currentSPLevel == 2)
-                    spMessageText.text = "Reputasi Anda masuk Bar 1 (Kritis). Waspada!";
-                else
-                    spMessageText.text = "Reputasi Anda turun ke Bar 2. Segera perbaiki!";
+                Debug.LogWarning("[DEBUG EOD] spPopupPanel is NULL! Assign it in the Inspector to show the SP popup.");
+                ShowDayReport();
             }
-
-            spPopupPanel.SetActive(true);
         }
         else
         {
             ShowDayReport();
         }
+
+        Debug.Log($"[DEBUG EOD] Did player get warning this day? {currentSPLevel >= 1}");
     }
 
     public void OnSPButtonClicked()
     {
+        if (spPopupTimer != null)
+        {
+            StopCoroutine(spPopupTimer);
+            spPopupTimer = null;
+        }
         if (spPopupPanel != null) spPopupPanel.SetActive(false);
+        ShowDayReport();
+    }
+
+    private IEnumerator SPPopupAutoClose()
+    {
+        yield return new WaitForSeconds(spPopupDuration);
+
+        if (spPopupPanel != null) spPopupPanel.SetActive(false);
+        spPopupTimer = null;
         ShowDayReport();
     }
 
@@ -257,6 +359,13 @@ public class GameManager : MonoBehaviour
         if (currentSPLevel >= 3)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            return;
+        }
+
+        if (currentDay >= dayConfigurations.Length)
+        {
+            Debug.Log("All days completed! Loading Finish scene...");
+            SceneManager.LoadScene("Finish");
             return;
         }
 

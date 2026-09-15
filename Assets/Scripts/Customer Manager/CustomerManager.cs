@@ -39,6 +39,10 @@ public class CustomerManager : MonoBehaviour
     public GameObject foodObject;
     public SpriteRenderer foodRenderer;
 
+    [Header("Audio Setup")]
+    public AudioSource audioSource;
+    public AudioClip paperSpawnSFX;
+
     void Awake()
     {
         Instance = this;
@@ -124,7 +128,7 @@ public class CustomerManager : MonoBehaviour
         {
             currentProduct = currentCustomer.possibleProducts[Random.Range(0, currentCustomer.possibleProducts.Length)];
             
-            namaProdukText.text = "Pengaju: " + currentProduct.namaProduk;
+            namaProdukText.text = " " + currentProduct.namaProduk;
             gulaText.text = "Gula: " + currentProduct.gula + "g";
             garamText.text = "Garam: " + currentProduct.garam + "g";
             lemakText.text = "Lemak: " + currentProduct.lemak + "g";
@@ -139,6 +143,11 @@ public class CustomerManager : MonoBehaviour
 
         paperContainer.SetActive(true);
         SetPaperTextVisible(true);
+
+        if (audioSource != null && paperSpawnSFX != null)
+        {
+            audioSource.PlayOneShot(paperSpawnSFX);
+        }
         
         GameManager.Instance.OnCustomerReady(currentProduct);
     }
