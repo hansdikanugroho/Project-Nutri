@@ -33,6 +33,7 @@ public class StampController : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale == 0f) return;
         if (Mouse.current == null) return;
 
         // KONDISI UTAMA: Jika kertas sudah dicap, matikan interaksi stamp!

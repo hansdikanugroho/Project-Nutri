@@ -1,0 +1,520 @@
+fileFormatVersion: 2
+guid: 782e95b8c23d5904196bd3be51f6cc65
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6802820105003185934
+    second: JUDUL GAME_0
+  - first:
+      213: -7438994756732062929
+    second: JUDUL GAME_1
+  - first:
+      213: -1193762248218010520
+    second: JUDUL GAME_2
+  - first:
+      213: -7009709951300475982
+    second: JUDUL GAME_3
+  - first:
+      213: -2820737258103777256
+    second: JUDUL GAME_4
+  - first:
+      213: 9966747005875612
+    second: JUDUL GAME_5
+  - first:
+      213: 6349302204611582120
+    second: JUDUL GAME_6
+  - first:
+      213: -4119106023465028831
+    second: JUDUL GAME_7
+  - first:
+      213: -2203917986920694074
+    second: JUDUL GAME_8
+  - first:
+      213: -2531270136701458654
+    second: JUDUL GAME_9
+  - first:
+      213: 6299110554539282416
+    second: JUDUL GAME_10
+  - first:
+      213: -4138314695972761272
+    second: JUDUL GAME_11
+  - first:
+      213: -8703437996644990063
+    second: JUDUL GAME_12
+  - first:
+      213: 6760708123121883976
+    second: JUDUL GAME_13
+  - first:
+      213: 6616365548676403736
+    second: JUDUL GAME_14
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: JUDUL GAME_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 785
+        height: 915
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e07b995b7d8786e50800000000000000
+      internalID: 6802820105003185934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_1
+      rect:
+        serializedVersion: 2
+        x: 919
+        y: 401
+        width: 322
+        height: 348
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f23fdf6aea163c890800000000000000
+      internalID: -7438994756732062929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_2
+      rect:
+        serializedVersion: 2
+        x: 1297
+        y: 398
+        width: 307
+        height: 351
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86c91b06f87ee6fe0800000000000000
+      internalID: -1193762248218010520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_3
+      rect:
+        serializedVersion: 2
+        x: 1627
+        y: 401
+        width: 297
+        height: 351
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b3e63630f188be90800000000000000
+      internalID: -7009709951300475982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_4
+      rect:
+        serializedVersion: 2
+        x: 1960
+        y: 401
+        width: 313
+        height: 351
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 818d30e986abad8d0800000000000000
+      internalID: -2820737258103777256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_5
+      rect:
+        serializedVersion: 2
+        x: 2321
+        y: 400
+        width: 82
+        height: 352
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c95f9de14b8632000800000000000000
+      internalID: 9966747005875612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_6
+      rect:
+        serializedVersion: 2
+        x: 919
+        y: 142
+        width: 52
+        height: 196
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a85a7d07b04d1850800000000000000
+      internalID: 6349302204611582120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_7
+      rect:
+        serializedVersion: 2
+        x: 997
+        y: 142
+        width: 175
+        height: 196
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 123f13745eef5d6c0800000000000000
+      internalID: -4119106023465028831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_8
+      rect:
+        serializedVersion: 2
+        x: 1186
+        y: 140
+        width: 156
+        height: 198
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ce7f7b844c1a61e0800000000000000
+      internalID: -2203917986920694074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_9
+      rect:
+        serializedVersion: 2
+        x: 1357
+        y: 142
+        width: 160
+        height: 196
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 227ea5fc83f1fdcd0800000000000000
+      internalID: -2531270136701458654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_10
+      rect:
+        serializedVersion: 2
+        x: 1534
+        y: 142
+        width: 142
+        height: 193
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ff4a3cdcafea6750800000000000000
+      internalID: 6299110554539282416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_11
+      rect:
+        serializedVersion: 2
+        x: 1687
+        y: 140
+        width: 181
+        height: 197
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 841d3c1b5b0c196c0800000000000000
+      internalID: -4138314695972761272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_12
+      rect:
+        serializedVersion: 2
+        x: 1873
+        y: 143
+        width: 161
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 193865d314d273780800000000000000
+      internalID: -8703437996644990063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_13
+      rect:
+        serializedVersion: 2
+        x: 2029
+        y: 140
+        width: 202
+        height: 198
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84b17ccd73cd2dd50800000000000000
+      internalID: 6760708123121883976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JUDUL GAME_14
+      rect:
+        serializedVersion: 2
+        x: 2245
+        y: 142
+        width: 158
+        height: 194
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8125df8596d02db50800000000000000
+      internalID: 6616365548676403736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      JUDUL GAME_0: 6802820105003185934
+      JUDUL GAME_1: -7438994756732062929
+      JUDUL GAME_10: 6299110554539282416
+      JUDUL GAME_11: -4138314695972761272
+      JUDUL GAME_12: -8703437996644990063
+      JUDUL GAME_13: 6760708123121883976
+      JUDUL GAME_14: 6616365548676403736
+      JUDUL GAME_2: -1193762248218010520
+      JUDUL GAME_3: -7009709951300475982
+      JUDUL GAME_4: -2820737258103777256
+      JUDUL GAME_5: 9966747005875612
+      JUDUL GAME_6: 6349302204611582120
+      JUDUL GAME_7: -4119106023465028831
+      JUDUL GAME_8: -2203917986920694074
+      JUDUL GAME_9: -2531270136701458654
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
