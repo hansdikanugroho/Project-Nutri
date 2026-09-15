@@ -24,18 +24,25 @@ public class TimeSetting
 
 public class DayNightController : MonoBehaviour
 {
-    [Header("Komponen Target")]
-    public Light2D[] globalLights; // Pakai Array biar bisa masukin 2 Global Light
+    [Header("Komponen Target Utama")]
+    public Light2D[] globalLights; 
     public Light2D freeformLight;
+
+    [Header("Efek Khusus Malam & Boss")]
+    public GameObject[] lampuMalam; 
+    public GameObject gloomOverlayCanvas; 
 
     [Header("Durasi Transisi (Detik)")]
     public float transitionTime = 2f;
 
-    [Header("Setting 4 Waktu")]
+    [Header("Setting Waktu Normal")]
     public TimeSetting pagi;
     public TimeSetting siang;
     public TimeSetting sore;
     public TimeSetting malam;
+
+    [Header("Setting Khusus Boss Event")]
+    public TimeSetting bossEvent; // Atur warna merah/deep di Inspector sini
 
     void Start()
     {
@@ -58,11 +65,53 @@ public class DayNightController : MonoBehaviour
             freeformLight.shapeLightFalloffSize = pagi.rayFalloff;
             freeformLight.falloffIntensity = pagi.rayFalloffStrength;
         }
+
+        ToggleNightEffects(false);
     }
 
-    // Fungsi baru untuk dipanggil oleh CustomerManager
+    private void ToggleNightEffects(bool isNight)
+    {
+        if (gloomOverlayCanvas != null)
+        {
+            gloomOverlayCanvas.SetActive(isNight);
+        }
+
+        foreach (GameObject lampu in lampuMalam)
+        {
+            if (lampu != null)
+            {
+                lampu.SetActive(isNight);
+            }
+        }
+    }
+
+    // Panggil ini khusus saat event Boss/Penyelundup muncul
+    public void TriggerBossEvent()
+    {
+        // Paksa nyalakan canvas gloom overlay buat nambah kesan berat/tegang
+        if (gloomOverlayCanvas != null)
+        {
+            gloomOverlayCanvas.SetActive(true);
+        }
+
+        // Paksa nyalakan lampu ruangan biar karakter tetap kelihatan meski global light gelap
+        foreach (GameObject lampu in lampuMalam)
+        {
+            if (lampu != null)
+            {
+                lampu.SetActive(true);
+            }
+        }
+
+        StartTransition(bossEvent);
+    }
+
+    // Fungsi ini dipanggil oleh CustomerManager untuk waktu normal
     public void SetTimePhase(int phaseIndex)
     {
+        bool isMalam = (phaseIndex >= 3);
+        ToggleNightEffects(isMalam);
+
         if (phaseIndex == 0) StartTransition(pagi);
         else if (phaseIndex == 1) StartTransition(siang);
         else if (phaseIndex == 2) StartTransition(sore);
