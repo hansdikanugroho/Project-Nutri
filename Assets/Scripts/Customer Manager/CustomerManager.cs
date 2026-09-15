@@ -22,6 +22,7 @@ public class CustomerManager : MonoBehaviour
     [Header("Visual References")]
     public GameObject paperContainer;
     public SpriteRenderer paperSprite;
+    public SpriteRenderer stampAreaRenderer;
     public CanvasGroup paperUI;
     
     [Header("Paper Text References")]
@@ -38,7 +39,11 @@ public class CustomerManager : MonoBehaviour
     public GameObject foodObject;
     public SpriteRenderer foodRenderer;
 
-    void Awake() => Instance = this;
+    void Awake()
+    {
+        Instance = this;
+        SetPaperTextVisible(false);
+    }
 
     void Start()
     {
@@ -133,10 +138,7 @@ public class CustomerManager : MonoBehaviour
         if (foodObject != null) foodObject.SetActive(true);
 
         paperContainer.SetActive(true);
-        namaProdukText.gameObject.SetActive(true);
-        gulaText.gameObject.SetActive(true);
-        garamText.gameObject.SetActive(true);
-        lemakText.gameObject.SetActive(true);
+        SetPaperTextVisible(true);
         
         GameManager.Instance.OnCustomerReady(currentProduct);
     }
@@ -155,6 +157,7 @@ public class CustomerManager : MonoBehaviour
         float fadeDuration = 1f;
         float timeElapsed = 0f;
         Color pColor = paperSprite.color;
+        Color stampAreaColor = stampAreaRenderer != null ? stampAreaRenderer.color : Color.white;
         Color cColor = customerRenderer.color;
         Color fColor = foodRenderer != null ? foodRenderer.color : Color.white;
 
@@ -167,6 +170,12 @@ public class CustomerManager : MonoBehaviour
             cColor.a = alpha;
             paperSprite.color = pColor; 
             customerRenderer.color = cColor;
+
+            if (stampAreaRenderer != null)
+            {
+                stampAreaColor.a = alpha;
+                stampAreaRenderer.color = stampAreaColor;
+            }
             
             if (foodRenderer != null)
             {
@@ -183,10 +192,7 @@ public class CustomerManager : MonoBehaviour
         if (foodObject != null) foodObject.SetActive(false); 
         paperContainer.SetActive(false); 
         
-        namaProdukText.gameObject.SetActive(false);
-        gulaText.gameObject.SetActive(false);
-        garamText.gameObject.SetActive(false);
-        lemakText.gameObject.SetActive(false);
+        SetPaperTextVisible(false);
 
         // Setelah bersih-bersih, suruh GameManager memanggil pelanggan berikutnya
         GameManager.Instance.CheckDayProgress();
@@ -195,11 +201,25 @@ public class CustomerManager : MonoBehaviour
     private void ResetFadeColors()
     {
         Color pColor = paperSprite.color; pColor.a = 1f; paperSprite.color = pColor;
+        if (stampAreaRenderer != null)
+        {
+            Color stampAreaColor = stampAreaRenderer.color;
+            stampAreaColor.a = 1f;
+            stampAreaRenderer.color = stampAreaColor;
+        }
         Color cColor = customerRenderer.color; cColor.a = 1f; customerRenderer.color = cColor;
         if (foodRenderer != null)
         {
             Color fColor = foodRenderer.color; fColor.a = 1f; foodRenderer.color = fColor;
         }
         if (paperUI != null) paperUI.alpha = 1f;
+    }
+
+    private void SetPaperTextVisible(bool isVisible)
+    {
+        if (namaProdukText != null) namaProdukText.gameObject.SetActive(isVisible);
+        if (gulaText != null) gulaText.gameObject.SetActive(isVisible);
+        if (garamText != null) garamText.gameObject.SetActive(isVisible);
+        if (lemakText != null) lemakText.gameObject.SetActive(isVisible);
     }
 }

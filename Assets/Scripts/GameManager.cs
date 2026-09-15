@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
     public GameObject dayReportPanel;
     public TextMeshProUGUI dayTitleText;
     public TextMeshProUGUI reputationResultText;
+    public Button nextDayButton;
 
     [Header("SP Popup UI")]
     public GameObject spPopupPanel;
@@ -59,6 +60,11 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        if (nextDayButton != null)
+        {
+            nextDayButton.onClick.AddListener(OnNextDayButtonClicked);
+        }
+
         if (reputationBarRect != null)
         {
             originalBarPos = reputationBarRect.anchoredPosition;
@@ -106,6 +112,8 @@ public class GameManager : MonoBehaviour
 
             if (currentConfig.dayCustomerDatabase != null && currentConfig.dayCustomerDatabase.Length > 0)
             {
+                currentCustomersPerDay = currentConfig.dayCustomerDatabase.Length;
+
                 if (CustomerManager.Instance != null)
                     CustomerManager.Instance.SetTodayCustomers(currentConfig.dayCustomerDatabase);
             }
@@ -208,7 +216,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Reputasi akhir hari ke-" + currentDay + ": " + reputation + " (Perubahan: " + dailyReputationChange + ")");
 
-        if (currentSPLevel >= 1)
+        if (currentSPLevel >= 1 && spPopupPanel != null)
         {
             if (spTitleText != null)
             {
@@ -230,7 +238,7 @@ public class GameManager : MonoBehaviour
                     spMessageText.text = "Reputasi Anda turun ke Bar 2. Segera perbaiki!";
             }
 
-            if (spPopupPanel != null) spPopupPanel.SetActive(true);
+            spPopupPanel.SetActive(true);
         }
         else
         {
@@ -258,6 +266,7 @@ public class GameManager : MonoBehaviour
 
     private void ShowDayReport()
     {
+        dayReportPanel.transform.localScale = Vector3.one;
         dayReportPanel.SetActive(true);
         
         if (dayTitleText != null) 
@@ -267,6 +276,14 @@ public class GameManager : MonoBehaviour
         {
             string changeText = dailyReputationChange >= 0 ? "+" + dailyReputationChange : dailyReputationChange.ToString();
             reputationResultText.text = "Perubahan Reputasi: " + changeText + "\nReputasi Akhir: " + reputation;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (nextDayButton != null)
+        {
+            nextDayButton.onClick.RemoveListener(OnNextDayButtonClicked);
         }
     }
 
