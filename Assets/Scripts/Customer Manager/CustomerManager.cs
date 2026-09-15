@@ -35,9 +35,24 @@ public class CustomerManager : MonoBehaviour
     public GameObject customerObject;
     public SpriteRenderer customerRenderer;
 
+    [Header("Food Visual")]
+    public GameObject foodObject;
+    public SpriteRenderer foodRenderer;
+
     void Awake() => Instance = this;
 
+    void Start()
+    {
+        if (foodObject != null) foodObject.SetActive(false);
+    }
+
     // Pastikan fungsi ini dipanggil sekali saat HARI BARU dimulai (misal dari GameManager.StartNewDay)
+    public void SetCustomerDatabase(CustomerData[] newDatabase)
+    {
+        if (newDatabase == null || newDatabase.Length == 0) return;
+        customerDatabase = newDatabase;
+    }
+
     public void GenerateDailyQueue()
     {
         dailyCustomerQueue.Clear();
@@ -58,6 +73,7 @@ public class CustomerManager : MonoBehaviour
     private IEnumerator SpawnSequence()
     {
         paperContainer.SetActive(false);
+        if (foodObject != null) foodObject.SetActive(false);
         ResetFadeColors();
 
         if (dailyCustomerQueue.Count > 0)
@@ -112,6 +128,13 @@ public class CustomerManager : MonoBehaviour
             lemakText.text = "Lemak: " + currentProduct.lemak + "g";
         }
 
+        if (foodRenderer != null && currentProduct.gambarMakanan != null)
+        {
+            foodRenderer.sprite = currentProduct.gambarMakanan;
+        }
+
+        if (foodObject != null) foodObject.SetActive(true);
+
         paperContainer.SetActive(true);
         namaProdukText.gameObject.SetActive(true);
         gulaText.gameObject.SetActive(true);
@@ -136,6 +159,7 @@ public class CustomerManager : MonoBehaviour
         float timeElapsed = 0f;
         Color pColor = paperSprite.color;
         Color cColor = customerRenderer.color;
+        Color fColor = foodRenderer != null ? foodRenderer.color : Color.white;
 
         while (timeElapsed < fadeDuration)
         {
@@ -147,12 +171,19 @@ public class CustomerManager : MonoBehaviour
             paperSprite.color = pColor; 
             customerRenderer.color = cColor;
             
+            if (foodRenderer != null)
+            {
+                fColor.a = alpha;
+                foodRenderer.color = fColor;
+            }
+            
             if (paperUI != null) paperUI.alpha = alpha;
             
             yield return null;
         }
 
         customerObject.SetActive(false); 
+        if (foodObject != null) foodObject.SetActive(false); 
         paperContainer.SetActive(false); 
         
         namaProdukText.gameObject.SetActive(false);
@@ -168,6 +199,10 @@ public class CustomerManager : MonoBehaviour
     {
         Color pColor = paperSprite.color; pColor.a = 1f; paperSprite.color = pColor;
         Color cColor = customerRenderer.color; cColor.a = 1f; customerRenderer.color = cColor;
+        if (foodRenderer != null)
+        {
+            Color fColor = foodRenderer.color; fColor.a = 1f; foodRenderer.color = fColor;
+        }
         if (paperUI != null) paperUI.alpha = 1f;
     }
 }

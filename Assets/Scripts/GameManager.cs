@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections; 
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,7 +10,8 @@ public class GameManager : MonoBehaviour
     
     [Header("Game State")]
     public int reputation = 100;
-    public float customerPatience = 15f; 
+    public int dailyReputationChange = 0;
+    private float customerPatience = 15f; 
     private float currentTimer;
     
     public bool isProcessing = false; 
@@ -22,14 +24,19 @@ public class GameManager : MonoBehaviour
 
     [Header("Day Cycle System")]
     public int currentDay = 1;
-    [HideInInspector] // Disembunyikan karena sekarang otomatis ngikutin jumlah database
-    public int customersPerDay = 5; 
+    public DayConfig[] dayConfigurations; 
+    private int customersPerDay = 5; 
     private int customersServedToday = 0;
     
     [Header("Day Report UI")]
     public GameObject dayReportPanel;
     public TextMeshProUGUI dayTitleText;
     public TextMeshProUGUI reputationResultText;
+
+    [Header("SP Popup UI")]
+    public GameObject spPopupPanel;
+    public TextMeshProUGUI spTitleText;
+    public TextMeshProUGUI spMessageText;
 
     [Header("Reputation Bar System")]
     public int maxReputation = 100;
@@ -84,13 +91,25 @@ public class GameManager : MonoBehaviour
 
     public void StartNewDay()
     {
+        dailyReputationChange = 0;
         customersServedToday = 0;
         if (dayReportPanel != null) dayReportPanel.SetActive(false);
+        if (spPopupPanel != null) spPopupPanel.SetActive(false);
         
-        // Sinkronisasi target pelanggan harian dengan jumlah database
-        if (CustomerManager.Instance != null && CustomerManager.Instance.customerDatabase != null)
+        // Loading konfigurasi hari ini; kalau index di luar array, pakai index terakhir (endless mode)
+        if (dayConfigurations != null && dayConfigurations.Length > 0)
         {
-            customersPerDay = CustomerManager.Instance.customerDatabase.Length;
+            int dayIndex = Mathf.Clamp(currentDay - 1, 0, dayConfigurations.Length - 1);
+            DayConfig activeConfig = dayConfigurations[dayIndex];
+
+            customersPerDay = activeConfig.targetCustomers;
+            customerPatience = activeConfig.customerPatience;
+
+            if (activeConfig.dayCustomerDatabase != null && activeConfig.dayCustomerDatabase.Length > 0)
+            {
+                if (CustomerManager.Instance != null)
+                    CustomerManager.Instance.SetCustomerDatabase(activeConfig.dayCustomerDatabase);
+            }
         }
         
         Debug.Log("Hari ke-" + currentDay + " Dimulai!");
@@ -108,27 +127,6 @@ public class GameManager : MonoBehaviour
         currentTimer = customerPatience;
     }
 
-    public void UpdateReputation(int amount)
-    {
-        reputation += amount;
-        reputation = Mathf.Clamp(reputation, 0, maxReputation); 
-
-        if(reputationSlider != null)
-        {
-            reputationSlider.value = reputation;
-            UpdateBarColor(); 
-        }
-
-        if (amount < 0 && reputationBarRect != null)
-        {
-            StopCoroutine("ShakeReputationBar"); 
-            StartCoroutine("ShakeReputationBar");
-        }
-
-        Debug.Log("Reputasi saat ini: " + reputation);
-        CheckReputationZone();
-    }
-
     private void UpdateBarColor()
     {
         if (reputationFillImage == null) return;
@@ -141,29 +139,6 @@ public class GameManager : MonoBehaviour
             reputationFillImage.color = sp2Color;
     }
 
-    private void CheckReputationZone()
-    {
-        if (reputation <= 0 && currentSPLevel < 3)
-        {
-            currentSPLevel = 3;
-            Debug.LogWarning("GAME OVER: Reputasi habis! Anda Dipecat.");
-        }
-        else if (reputation > 0 && reputation <= 33 && currentSPLevel < 2)
-        {
-            currentSPLevel = 2;
-            Debug.LogWarning("SP 2: Reputasi masuk Bar 1 (Kritis)!");
-        }
-        else if (reputation > 33 && reputation <= 66 && currentSPLevel < 1)
-        {
-            currentSPLevel = 1;
-            Debug.LogWarning("SP 1: Reputasi turun ke Bar 2!");
-        }
-        else if (reputation > 66)
-        {
-            currentSPLevel = 0; 
-        }
-    }
-
     public void ProcessDecision(NutriLevel appliedLevel)
     {
         if (sudahDiCap || !isProcessing) return; 
@@ -173,8 +148,8 @@ public class GameManager : MonoBehaviour
 
         bool isCorrect = (appliedLevel == activeProduct.levelSebenarnya);
 
-        if (isCorrect) UpdateReputation(10);
-        else UpdateReputation(-15);
+        if (isCorrect) dailyReputationChange += 10;
+        else dailyReputationChange -= 15;
         
         CustomerManager.Instance.EndCustomerSequence(isCorrect);
     }
@@ -186,7 +161,7 @@ public class GameManager : MonoBehaviour
         sudahDiCap = true;
         isProcessing = false;
         
-        UpdateReputation(-20);
+        dailyReputationChange -= 20;
         
         CustomerManager.Instance.EndCustomerSequence(false);
     }
@@ -199,12 +174,88 @@ public class GameManager : MonoBehaviour
 
         if (customersServedToday >= customersPerDay)
         {
-            ShowDayReport();
+            ProcessEndOfDay();
         }
         else
         {
             CustomerManager.Instance.StartCustomerSequence();
         }
+    }
+
+    private void ProcessEndOfDay()
+    {
+        reputation += dailyReputationChange;
+        reputation = Mathf.Clamp(reputation, 0, maxReputation); 
+
+        if(reputationSlider != null)
+        {
+            reputationSlider.value = reputation;
+            UpdateBarColor(); 
+        }
+
+        if (dailyReputationChange < 0 && reputationBarRect != null)
+        {
+            StopCoroutine("ShakeReputationBar"); 
+            StartCoroutine("ShakeReputationBar");
+        }
+
+        if (reputation <= 0)
+            currentSPLevel = 3;
+        else if (reputation <= 33)
+            currentSPLevel = 2;
+        else if (reputation <= 66)
+            currentSPLevel = 1;
+        else
+            currentSPLevel = 0;
+
+        Debug.Log("Reputasi akhir hari ke-" + currentDay + ": " + reputation + " (Perubahan: " + dailyReputationChange + ")");
+
+        if (currentSPLevel >= 1)
+        {
+            if (spTitleText != null)
+            {
+                if (currentSPLevel == 3)
+                    spTitleText.text = "GAME OVER!";
+                else if (currentSPLevel == 2)
+                    spTitleText.text = "SP 2 - Kritis!";
+                else
+                    spTitleText.text = "SP 1 - Peringatan!";
+            }
+
+            if (spMessageText != null)
+            {
+                if (currentSPLevel == 3)
+                    spMessageText.text = "Reputasi Anda habis. Anda Dipecat!";
+                else if (currentSPLevel == 2)
+                    spMessageText.text = "Reputasi Anda masuk Bar 1 (Kritis). Waspada!";
+                else
+                    spMessageText.text = "Reputasi Anda turun ke Bar 2. Segera perbaiki!";
+            }
+
+            if (spPopupPanel != null) spPopupPanel.SetActive(true);
+        }
+        else
+        {
+            ShowDayReport();
+        }
+    }
+
+    public void OnSPButtonClicked()
+    {
+        if (spPopupPanel != null) spPopupPanel.SetActive(false);
+        ShowDayReport();
+    }
+
+    public void OnNextDayButtonClicked()
+    {
+        if (currentSPLevel >= 3)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            return;
+        }
+
+        currentDay++;
+        StartNewDay();
     }
 
     private void ShowDayReport()
@@ -216,15 +267,9 @@ public class GameManager : MonoBehaviour
             
         if (reputationResultText != null)
         {
-            if (reputation >= 67)
-                reputationResultText.text = "Kerja Bagus! Reputasi Anda: " + reputation;
-            else if (reputation >= 34)
-                reputationResultText.text = "Anda mendapat SP 1 hari ini. Reputasi: " + reputation;
-            else
-                reputationResultText.text = "Kritis! Anda mendapat SP 2. Reputasi: " + reputation;
+            string changeText = dailyReputationChange >= 0 ? "+" + dailyReputationChange : dailyReputationChange.ToString();
+            reputationResultText.text = "Perubahan Reputasi: " + changeText + "\nReputasi Akhir: " + reputation;
         }
-
-        currentDay++; 
     }
 
     private IEnumerator ShakeReputationBar()
@@ -247,14 +292,22 @@ public class GameManager : MonoBehaviour
     public void OnBribeAccepted()
     {
         Debug.LogWarning("Suap Diterima! Reputasi Anda turun sebagai bentuk risiko korupsi.");
-        UpdateReputation(-20); 
+        dailyReputationChange -= 20; 
         CustomerManager.Instance.ShowPaperAndStartTimer();
     }
 
     public void OnBribeRejected()
     {
         Debug.Log("Suap Ditolak! Anda mempertahankan integritas pekerjaan Anda.");
-        UpdateReputation(5); 
+        dailyReputationChange += 5; 
         CustomerManager.Instance.ShowPaperAndStartTimer();
     }
+}
+
+[System.Serializable]
+public class DayConfig
+{
+    public int targetCustomers;
+    public float customerPatience;
+    public CustomerData[] dayCustomerDatabase;
 }
