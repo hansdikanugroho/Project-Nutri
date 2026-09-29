@@ -22,15 +22,22 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
     private Color targetHighlightColor;
 
     private Vector2 startAnchoredPosition;
+    private Vector3 startLocalScale;
     private int startSiblingIndex;
+    private Transform startParent;
 
     private Canvas canvas;
     private RectTransform canvasRect;
     private Camera canvasCamera;
 
+    private StampDropArea dropArea;
+
     private Vector3 grabOffset;
     private bool isDragging;
     private bool isOverTarget;
+    private bool dropHandled;
+    private bool resolveDone;
+    private bool visualCached;
 
     void Awake()
     {
@@ -45,28 +52,26 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
         }
 
         startAnchoredPosition = rect.anchoredPosition;
+        startLocalScale = rect.localScale;
         startSiblingIndex = rect.GetSiblingIndex();
+        startParent = rect.parent;
 
         canvas = GetComponentInParent<Canvas>();
         canvasRect = canvas != null ? canvas.transform as RectTransform : null;
         canvasCamera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
 
-        if (targetStampArea != null)
-        {
-            targetImage = targetStampArea.GetComponent<Image>();
-            if (targetImage != null)
-            {
-                targetBaseColor = targetImage.color;
-                targetHighlightColor = Color.Lerp(targetBaseColor, Color.green, highlightStrength);
-                targetHighlightColor.a = targetBaseColor.a;
-            }
-        }
+        ResolveDropArea();
 
         if (stampImage != null)
         {
             stampImage.raycastTarget = true;
             if (idleSprite != null) stampImage.sprite = idleSprite;
         }
+    }
+
+    void OnEnable()
+    {
+        ResolveDropArea();
     }
 
     void OnDisable()
@@ -76,12 +81,95 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
 
     void Update()
     {
+        if (!resolveDone)
+        {
+            ResolveDropArea();
+            resolveDone = dropArea != null || targetStampArea != null;
+        }
+
         if (!isDragging) return;
 
         if (!CanInteract() || rect == null)
         {
             CancelDrag();
         }
+    }
+
+    private void ResolveDropArea()
+    {
+        if (dropArea != null) return;
+
+        Canvas searchRoot = canvas != null ? canvas : GetComponentInParent<Canvas>();
+
+        if (targetStampArea != null)
+        {
+            dropArea = targetStampArea.GetComponent<StampDropArea>();
+        }
+
+        if (dropArea == null)
+        {
+            dropArea = StampDropArea.Instance;
+        }
+
+        if (dropArea == null && searchRoot != null)
+        {
+            dropArea = searchRoot.GetComponentInChildren<StampDropArea>(true);
+        }
+
+        if (dropArea != null && targetStampArea == null)
+        {
+            targetStampArea = dropArea.transform as RectTransform;
+        }
+
+        if (targetStampArea == null)
+        {
+            targetStampArea = FindRectByName(searchRoot, "StampArea");
+        }
+
+        if (dropArea == null && targetStampArea != null)
+        {
+            dropArea = targetStampArea.GetComponent<StampDropArea>();
+            if (dropArea == null)
+            {
+                dropArea = targetStampArea.gameObject.AddComponent<StampDropArea>();
+            }
+        }
+
+        CacheTargetVisual();
+    }
+
+    private static RectTransform FindRectByName(Canvas root, string objectName)
+    {
+        Transform[] all = Resources.FindObjectsOfTypeAll<Transform>();
+        for (int i = 0; i < all.Length; i++)
+        {
+            Transform t = all[i];
+            if (t == null || t.name != objectName) continue;
+            if (t is RectTransform rect && (root == null || rect.IsChildOf(root.transform) || rect == root.transform))
+            {
+                return rect;
+            }
+        }
+        return null;
+    }
+
+    private void CacheTargetVisual()
+    {
+        if (targetStampArea == null || visualCached) return;
+
+        targetImage = targetStampArea.GetComponent<Image>();
+        if (targetImage == null) return;
+
+        visualCached = true;
+
+        if (dropArea != null)
+        {
+            targetImage.raycastTarget = true;
+        }
+
+        targetBaseColor = targetImage.color;
+        targetHighlightColor = Color.Lerp(targetBaseColor, Color.green, highlightStrength);
+        targetHighlightColor.a = targetBaseColor.a;
     }
 
     private bool CanInteract()
@@ -92,6 +180,8 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
 
     private bool CanAcceptDrop()
     {
+        if (dropArea != null) return dropArea.CanAcceptDrop();
+
         if (targetStampArea == null) return false;
         if (!targetStampArea.gameObject.activeInHierarchy) return false;
         return GameManager.Instance != null && GameManager.Instance.isProcessing;
@@ -113,15 +203,27 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
         if (!CanInteract() || rect == null) return;
 
         isDragging = true;
-        rect.SetAsLastSibling();
+        dropHandled = false;
+
+        PromoteToCanvasTop();
 
         if (stampImage != null)
         {
             if (dragSprite != null) stampImage.sprite = dragSprite;
             stampImage.color = new Color(1f, 1f, 1f, stampImage.color.a);
+            stampImage.raycastTarget = false;
         }
 
-        SetHighlight(IsOverTarget(eventData.position));
+        SetHighlight(IsOverTarget(eventData.position) && CanAcceptDrop());
+    }
+
+    private void PromoteToCanvasTop()
+    {
+        if (canvasRect == null) return;
+        if (rect.parent == canvasRect) return;
+
+        rect.SetParent(canvasRect, true);
+        rect.SetAsLastSibling();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -134,23 +236,41 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
             rect.position = worldPoint + grabOffset;
         }
 
-        SetHighlight(IsOverTarget(eventData.position));
+        SetHighlight(IsOverTarget(eventData.position) && CanAcceptDrop());
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!isDragging) return;
 
-        bool shouldStamp = IsOverTarget(eventData.position) && CanAcceptDrop();
+        bool shouldStamp = !dropHandled
+            && IsOverTarget(eventData.position)
+            && CanAcceptDrop();
 
         isDragging = false;
+        dropHandled = false;
         ReturnToStart();
         SetHighlight(false);
 
         if (shouldStamp)
         {
-            GameManager.Instance.ProcessDecision(stampLevel);
+            CommitStamp();
         }
+    }
+
+    public void TryAcceptDrop(StampDropArea area)
+    {
+        if (!isDragging && !isOverTarget) return;
+        if (!CanAcceptDrop()) return;
+
+        dropHandled = true;
+        CommitStamp();
+    }
+
+    private void CommitStamp()
+    {
+        if (GameManager.Instance == null) return;
+        GameManager.Instance.ProcessDecision(stampLevel);
     }
 
     private void CancelDrag()
@@ -158,17 +278,29 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
         if (!isDragging) return;
 
         isDragging = false;
+        dropHandled = false;
         ReturnToStart();
         SetHighlight(false);
     }
 
     private void ReturnToStart()
     {
-        if (stampImage != null && idleSprite != null) stampImage.sprite = idleSprite;
+        if (stampImage != null)
+        {
+            if (idleSprite != null) stampImage.sprite = idleSprite;
+            stampImage.raycastTarget = true;
+        }
+
         if (rect == null) return;
+
+        if (startParent != null && rect.parent != startParent)
+        {
+            rect.SetParent(startParent, true);
+        }
 
         rect.SetSiblingIndex(startSiblingIndex);
         rect.anchoredPosition = startAnchoredPosition;
+        rect.localScale = startLocalScale;
     }
 
     private void SetHighlight(bool value)
@@ -176,7 +308,12 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
         if (value == isOverTarget) return;
 
         isOverTarget = value;
-        if (targetImage != null)
+
+        if (dropArea != null)
+        {
+            dropArea.SetHighlight(value);
+        }
+        else if (targetImage != null)
         {
             targetImage.color = value ? targetHighlightColor : targetBaseColor;
         }
