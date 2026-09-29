@@ -13,8 +13,20 @@ MonoBehaviour:
   m_Name: Soto
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
   namaProduk: Soto
+  asalProdusen: SSB
+  kategoriProduk: Makanan
   gambarMakanan: {fileID: -8405469488588529400, guid: 36b9a799e0ab2d04db98f84939837721, type: 3}
   gula: 10
   garam: 200
   lemak: 10
   levelSebenarnya: 1
+  isPemalsuan: 0
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
+  levelZatBerbahaya: 0
+  gulaAsli: 0
+  garamAsli: 0
+  lemakAsli: 0
+  levelAsli: 0
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

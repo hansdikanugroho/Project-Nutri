@@ -16,10 +16,9 @@ MonoBehaviour:
   spriteNetral: {fileID: 6701063624276941839, guid: a4f7ca4a8bd09cf419e3f9fe72802bf8, type: 3}
   spriteSenang: {fileID: -7429847798839914438, guid: 56d730a385722414c9bff89daa9192ad, type: 3}
   spriteMarah: {fileID: 6336469331982006229, guid: d5897697b9f381846b044f929cf5c1cf, type: 3}
+  spriteCemas: {fileID: 0}
   possibleProducts:
   - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
-  - {fileID: 11400000, guid: 357b7f12132e4ca4eb69d7a0810fa5be, type: 2}
-  - {fileID: 11400000, guid: bfb4d1f94a1204448b5e21f69a28b0a4, type: 2}
   canTriggerEvent: 0
   eventProbability: 0.2
   fungusMessageToTrigger: EventSuap_01

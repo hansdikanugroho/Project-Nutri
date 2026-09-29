@@ -1,6 +1,7 @@
 using UnityEngine;
 
 public enum NutriLevel { A, B, C, D }
+public enum DangerLevel { TidakAda, Sedang, Tinggi }
 
 [CreateAssetMenu(fileName = "NewProduct", menuName = "BPOM/Product Data")]
 public class ProductData : ScriptableObject
@@ -16,6 +17,8 @@ public class ProductData : ScriptableObject
     [Header("Data Pemalsuan (Investigasi)")]
     public bool isPemalsuan;
     public string kandunganBerbahaya; // e.g., "Formalin", "Boraks", "Rhodamin B", "Pemanis Buatan Berlebih"
+    public string dampakZatBerbahaya; // e.g., "Iritasi & gangguan saluran pencernaan"
+    public DangerLevel levelZatBerbahaya;
 
     [Header("Data Asli (Jika Pemalsuan)")]
     public int gulaAsli;

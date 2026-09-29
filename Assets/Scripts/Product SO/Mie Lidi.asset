@@ -13,8 +13,20 @@ MonoBehaviour:
   m_Name: Mie Lidi
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
   namaProduk: Mie Lidi
+  asalProdusen: PT Ayam Jago
+  kategoriProduk: Makanan
   gambarMakanan: {fileID: -3871432898921132491, guid: 80a542f3b0140cb4196b958f28e50fc4, type: 3}
   gula: 20
   garam: 300
   lemak: 6
   levelSebenarnya: 3
+  isPemalsuan: 0
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
+  levelZatBerbahaya: 0
+  gulaAsli: 0
+  garamAsli: 0
+  lemakAsli: 0
+  levelAsli: 0
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

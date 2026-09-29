@@ -26,8 +26,8 @@ public class CustomerManager : MonoBehaviour
 
     [Header("Visual References")]
     public GameObject paperContainer;
-    public Image paperImage;
-    public Image stampAreaImage;
+    public SpriteRenderer paperSprite;
+    public SpriteRenderer stampAreaRenderer;
     public CanvasGroup paperUI;
     
     [Header("Paper Text References")]
@@ -345,6 +345,8 @@ public class CustomerManager : MonoBehaviour
 
         float fadeDuration = 1f;
         float timeElapsed = 0f;
+        Color pColor = paperSprite.color;
+        Color stampAreaColor = stampAreaRenderer != null ? stampAreaRenderer.color : Color.white;
         Color cColor = customerRenderer.color;
         Color fColor = foodRenderer != null ? foodRenderer.color : Color.white;
 
@@ -352,18 +354,26 @@ public class CustomerManager : MonoBehaviour
         {
             timeElapsed += Time.deltaTime;
             float alpha = Mathf.Lerp(1f, 0f, timeElapsed / fadeDuration);
-
+            
+            pColor.a = alpha; 
             cColor.a = alpha;
+            paperSprite.color = pColor; 
             customerRenderer.color = cColor;
 
+            if (stampAreaRenderer != null)
+            {
+                stampAreaColor.a = alpha;
+                stampAreaRenderer.color = stampAreaColor;
+            }
+            
             if (foodRenderer != null)
             {
                 fColor.a = alpha;
                 foodRenderer.color = fColor;
             }
-
+            
             if (paperUI != null) paperUI.alpha = alpha;
-
+            
             yield return null;
         }
 
@@ -382,27 +392,19 @@ public class CustomerManager : MonoBehaviour
 
     private void ResetFadeColors()
     {
-        if (paperUI != null) paperUI.alpha = 1f;
-        if (paperImage != null)
+        Color pColor = paperSprite.color; pColor.a = 1f; paperSprite.color = pColor;
+        if (stampAreaRenderer != null)
         {
-            Color pColor = paperImage.color;
-            pColor.a = 1f;
-            paperImage.color = pColor;
-        }
-        if (stampAreaImage != null)
-        {
-            Color stampAreaColor = stampAreaImage.color;
+            Color stampAreaColor = stampAreaRenderer.color;
             stampAreaColor.a = 1f;
-            stampAreaImage.color = stampAreaColor;
+            stampAreaRenderer.color = stampAreaColor;
         }
-        if (customerRenderer != null)
-        {
-            Color cColor = customerRenderer.color; cColor.a = 1f; customerRenderer.color = cColor;
-        }
+        Color cColor = customerRenderer.color; cColor.a = 1f; customerRenderer.color = cColor;
         if (foodRenderer != null)
         {
             Color fColor = foodRenderer.color; fColor.a = 1f; foodRenderer.color = fColor;
         }
+        if (paperUI != null) paperUI.alpha = 1f;
     }
 
     private void SetPaperTextVisible(bool isVisible)
