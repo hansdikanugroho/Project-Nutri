@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class GGLIntroController : MonoBehaviour
 {
     [SerializeField] private Button closeButton;
+    public GameObject panelKecil;
 
     private float resumeTimeScale = 1f;
     private bool isPausingGame;
@@ -29,6 +30,13 @@ public class GGLIntroController : MonoBehaviour
         isPausingGame = false;
         Time.timeScale = resumeTimeScale;
         gameObject.SetActive(false);
+        if (panelKecil != null) panelKecil.SetActive(true);
+    }
+
+    public void OpenLargePanel()
+    {
+        gameObject.SetActive(true);
+        if (panelKecil != null) panelKecil.SetActive(false);
     }
 
     private void OnDestroy()

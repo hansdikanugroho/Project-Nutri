@@ -9,6 +9,7 @@ public class CustomerData : ScriptableObject
     public Sprite spriteNetral;
     public Sprite spriteSenang;
     public Sprite spriteMarah;
+    public Sprite spriteCemas;
     
     [Header("Daftar Produk Bawaan")]
     public ProductData[] possibleProducts; // SO Produk dimasukkan ke sini

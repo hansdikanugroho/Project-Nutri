@@ -17,10 +17,9 @@ MonoBehaviour:
   spriteSenang: {fileID: 3498265718595599744, guid: 673b2685e6e3a5e4e977216e21acb9c1, type: 3}
   spriteMarah: {fileID: 3498265718595599744, guid: 673b2685e6e3a5e4e977216e21acb9c1, type: 3}
   possibleProducts:
-  - {fileID: 11400000, guid: 1e70492e386a4ba45808e93404a2d02a, type: 2}
   - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
   - {fileID: 11400000, guid: e60d73dd3686de6449f2a250cc682b37, type: 2}
-  - {fileID: 11400000, guid: a42cd97f923b6944da4b62ec83a5e69a, type: 2}
+  - {fileID: 11400000, guid: 357b7f12132e4ca4eb69d7a0810fa5be, type: 2}
   canTriggerEvent: 0
   eventProbability: 0.2
   fungusMessageToTrigger: EventSuap_01

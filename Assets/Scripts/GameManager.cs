@@ -38,8 +38,6 @@ public class GameManager : MonoBehaviour
     public GameObject spPopupPanel;
     public TextMeshProUGUI spTitleText;
     public TextMeshProUGUI spMessageText;
-    private Coroutine spPopupTimer;
-    public float spPopupDuration = 5f;
 
     [Header("Reputation Bar System")]
     public int maxReputation = 100;
@@ -135,8 +133,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SetHUDActive(bool isActive)
+    {
+        if (timerSlider != null) timerSlider.gameObject.SetActive(isActive);
+        if (reputationSlider != null) reputationSlider.gameObject.SetActive(isActive);
+    }
+
     public void StartNewDay()
     {
+        SetHUDActive(false);
         dailyReputationChange = 0;
         customersServedToday = 0;
         if (dayReportPanel != null) dayReportPanel.SetActive(false);
@@ -167,6 +172,7 @@ public class GameManager : MonoBehaviour
 
     public void OnCustomerReady(ProductData productData)
     {
+        SetHUDActive(true);
         activeProduct = productData;
         sudahDiCap = false;
         isProcessing = true;
@@ -192,12 +198,26 @@ public class GameManager : MonoBehaviour
         sudahDiCap = true; 
         isProcessing = false; 
 
-        bool isCorrect = (appliedLevel == activeProduct.levelSebenarnya);
+        NutriLevel expectedLevel = activeProduct.isPemalsuan ? activeProduct.levelAsli : activeProduct.levelSebenarnya;
+        bool isCorrect = (appliedLevel == expectedLevel);
 
         if (isCorrect) dailyReputationChange += 10;
         else dailyReputationChange -= 15;
         
         CustomerManager.Instance.EndCustomerSequence(isCorrect);
+    }
+
+    public void ReduceTimer(float penaltyAmount)
+    {
+        if (!isProcessing || sudahDiCap) return;
+
+        currentTimer -= penaltyAmount;
+        if (timerSlider != null) timerSlider.value = currentTimer / currentCustomerPatience;
+
+        if (currentTimer <= 0)
+        {
+            CustomerTimeout();
+        }
     }
 
     private void CustomerTimeout()
@@ -232,7 +252,7 @@ public class GameManager : MonoBehaviour
     {
         reputation += dailyReputationChange;
         reputation = Mathf.Clamp(reputation, 0, maxReputation); 
-        Debug.Log($"[DEBUG EOD] Final Reputation: {reputation} | Current SP Level: {currentSPLevel}"); 
+        Debug.Log($"[DEBUG EOD] Reputation after this day: {reputation} | SP Level BEFORE evaluation: {currentSPLevel}"); 
 
         if(reputationSlider != null)
         {
@@ -271,60 +291,23 @@ public class GameManager : MonoBehaviour
 
         if (currentSPLevel >= 1)
         {
-            if (spPopupPanel != null)
-            {
-                if (spTitleText != null)
-                {
-                    if (currentSPLevel == 3)
-                        spTitleText.text = "GAME OVER!";
-                    else if (currentSPLevel == 2)
-                        spTitleText.text = "SP 2 - Kritis!";
-                    else
-                        spTitleText.text = "SP 1 - Peringatan!";
-                }
-
-                if (spMessageText != null)
-                {
-                    if (currentSPLevel == 3)
-                        spMessageText.text = "Reputasi Anda habis. Anda Dipecat!";
-                    else if (currentSPLevel == 2)
-                        spMessageText.text = "Reputasi Anda masuk Bar 1 (Kritis). Waspada!";
-                    else
-                        spMessageText.text = "Reputasi Anda turun ke Bar 2. Segera perbaiki!";
-                }
-
-                spPopupPanel.transform.localScale = Vector3.one;
-                spPopupPanel.transform.SetAsLastSibling();
-                spPopupPanel.SetActive(true);
-
-                if (!spPopupPanel.activeInHierarchy)
-                {
-                    Debug.LogWarning("[DEBUG EOD] SP popup is ACTIVE but INVISIBLE - its parent Canvas or ancestor is inactive. Check the popup's parent in the hierarchy.");
-                }
-
-                if (HasZeroScaledAncestor(spPopupPanel.transform))
-                {
-                    if (dayReportPanel != null)
-                    {
-                        spPopupPanel.transform.SetParent(dayReportPanel.transform, false);
-                        spPopupPanel.transform.localScale = Vector3.one;
-                        spPopupPanel.transform.localPosition = Vector3.zero;
-                        Debug.LogWarning("[DEBUG EOD] SP popup had a zero-scale ancestor - reparented it onto the Day Report canvas to make it visible.");
-                    }
-                    else
-                    {
-                        Debug.LogWarning("[DEBUG EOD] SP popup has a zero-scale ancestor and dayReportPanel is NULL - cannot auto-reparent. Fix the root canvas scale in the scene.");
-                    }
-                }
-
-                if (spPopupTimer != null) StopCoroutine(spPopupTimer);
-                spPopupTimer = StartCoroutine(SPPopupAutoClose());
-            }
+            string title;
+            if (currentSPLevel == 3)
+                title = "GAME OVER!";
+            else if (currentSPLevel == 2)
+                title = "SP 2 - Kritis!";
             else
-            {
-                Debug.LogWarning("[DEBUG EOD] spPopupPanel is NULL! Assign it in the Inspector to show the SP popup.");
-                ShowDayReport();
-            }
+                title = "SP 1 - Peringatan!";
+
+            string message;
+            if (currentSPLevel == 3)
+                message = "Reputasi Anda habis. Anda Dipecat!";
+            else if (currentSPLevel == 2)
+                message = "Reputasi Anda masuk Bar 1 (Kritis). Waspada!";
+            else
+                message = "Reputasi Anda turun ke Bar 2. Segera perbaiki!";
+
+            StartCoroutine(ShowSPSequence(title, message));
         }
         else
         {
@@ -336,22 +319,54 @@ public class GameManager : MonoBehaviour
 
     public void OnSPButtonClicked()
     {
-        if (spPopupTimer != null)
-        {
-            StopCoroutine(spPopupTimer);
-            spPopupTimer = null;
-        }
         if (spPopupPanel != null) spPopupPanel.SetActive(false);
         ShowDayReport();
     }
 
-    private IEnumerator SPPopupAutoClose()
+    private IEnumerator ShowSPSequence(string title, string message)
     {
-        yield return new WaitForSeconds(spPopupDuration);
+        if (spTitleText != null) spTitleText.text = title;
+        if (spMessageText != null) spMessageText.text = message;
+
+        if (dayReportPanel != null) dayReportPanel.SetActive(false);
+
+        if (spPopupPanel != null)
+        {
+            spPopupPanel.transform.localScale = Vector3.one;
+            spPopupPanel.transform.SetAsLastSibling();
+            spPopupPanel.SetActive(true);
+
+            if (!spPopupPanel.activeInHierarchy)
+            {
+                Debug.LogWarning("[DEBUG EOD] SP popup is ACTIVE but INVISIBLE - its parent Canvas or ancestor is inactive. Check the popup's parent in the hierarchy.");
+            }
+
+            if (HasZeroScaledAncestor(spPopupPanel.transform) && dayReportPanel != null)
+            {
+                spPopupPanel.transform.SetParent(dayReportPanel.transform, false);
+                spPopupPanel.transform.localScale = Vector3.one;
+                spPopupPanel.transform.localPosition = Vector3.zero;
+                Debug.LogWarning("[DEBUG EOD] SP popup had a zero-scale ancestor - reparented it onto the Day Report canvas to make it visible.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[DEBUG EOD] spPopupPanel is NULL! Assign it in the Inspector to show the SP popup.");
+        }
+
+        yield return new WaitForSeconds(5f);
 
         if (spPopupPanel != null) spPopupPanel.SetActive(false);
-        spPopupTimer = null;
-        ShowDayReport();
+
+        if (currentSPLevel >= 3)
+        {
+            Debug.Log("[DEBUG EOD] SP Level 3 - Game Over! Loading Finish scene...");
+            SceneManager.LoadScene("Finish");
+        }
+        else
+        {
+            ShowDayReport();
+        }
     }
 
     public void OnNextDayButtonClicked()

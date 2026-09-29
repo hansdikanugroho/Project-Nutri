@@ -13,8 +13,18 @@ MonoBehaviour:
   m_Name: Bika Ambon
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
   namaProduk: Bika Ambon
+  asalProdusen: Medan
+  kategoriProduk: Makanan
   gambarMakanan: {fileID: 2054582065379958118, guid: 03d194cbc16b8264794c3712d39e70de, type: 3}
   gula: 80
   garam: 10
   lemak: 60
   levelSebenarnya: 3
+  isPemalsuan: 0
+  kandunganBerbahaya: 
+  gulaAsli: 0
+  garamAsli: 0
+  lemakAsli: 0
+  levelAsli: 0
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

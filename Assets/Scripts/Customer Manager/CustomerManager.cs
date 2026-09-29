@@ -18,6 +18,7 @@ public class CustomerManager : MonoBehaviour
 
     private CustomerData currentCustomer;
     private ProductData currentProduct;
+    private bool hasInvestigated = false;
 
     [Header("Visual References")]
     public GameObject paperContainer;
@@ -27,9 +28,12 @@ public class CustomerManager : MonoBehaviour
     
     [Header("Paper Text References")]
     public TextMeshProUGUI namaProdukText;
+    public TextMeshProUGUI produsenText;
+    public TextMeshProUGUI kategoriText;
     public TextMeshProUGUI gulaText;
     public TextMeshProUGUI garamText;
     public TextMeshProUGUI lemakText;
+    public TextMeshProUGUI kandunganBerbahayaText;
 
     [Header("Customer Visual")]
     public GameObject customerObject;
@@ -51,6 +55,8 @@ public class CustomerManager : MonoBehaviour
 
     void Start()
     {
+        if (GameManager.Instance != null)
+            GameManager.Instance.SetHUDActive(false);
         if (foodObject != null) foodObject.SetActive(false);
     }
 
@@ -96,11 +102,35 @@ public class CustomerManager : MonoBehaviour
 
             currentCustomer = dailyCustomerQueue[0];
             dailyCustomerQueue.RemoveAt(0); 
-            
-            customerRenderer.sprite = currentCustomer.spriteNetral;
-            customerObject.SetActive(true); 
 
-            yield return new WaitForSeconds(3f); 
+            if (currentCustomer.possibleProducts.Length > 0)
+            {
+                currentProduct = currentCustomer.possibleProducts[Random.Range(0, currentCustomer.possibleProducts.Length)];
+            }
+
+            customerRenderer.sprite = currentCustomer.spriteNetral;
+
+            // 1. Set initial alpha to 0
+            Color cColor = customerRenderer.color;
+            cColor.a = 0f;
+            customerRenderer.color = cColor;
+
+            customerObject.SetActive(true);
+
+            // 2. Smooth fade-in loop
+            float fadeInDuration = 0.5f;
+            float timeElapsed = 0f;
+            while (timeElapsed < fadeInDuration)
+            {
+                timeElapsed += Time.deltaTime;
+                cColor.a = Mathf.Lerp(0f, 1f, timeElapsed / fadeInDuration);
+                customerRenderer.color = cColor;
+                yield return null;
+            }
+
+            // 3. Ensure alpha is exactly 1 at the end
+            cColor.a = 1f;
+            customerRenderer.color = cColor;
 
             if (currentCustomer.canTriggerEvent && Random.value <= currentCustomer.eventProbability)
             {
@@ -108,7 +138,14 @@ public class CustomerManager : MonoBehaviour
                 yield break; 
             }
 
-            ShowPaperAndStartTimer();
+            if (currentProduct != null && !string.IsNullOrEmpty(currentProduct.fungusIntroMessage))
+            {
+                Flowchart.BroadcastFungusMessage(currentProduct.fungusIntroMessage);
+            }
+            else
+            {
+                ShowPaperAndStartTimer();
+            }
         }
         else
         {
@@ -124,14 +161,22 @@ public class CustomerManager : MonoBehaviour
 
     public void ShowPaperAndStartTimer()
     {
-        if (currentCustomer.possibleProducts.Length > 0)
+        hasInvestigated = false;
+
+        if (currentCustomer.possibleProducts.Length > 0 && currentProduct != null)
         {
-            currentProduct = currentCustomer.possibleProducts[Random.Range(0, currentCustomer.possibleProducts.Length)];
-            
-            namaProdukText.text = " " + currentProduct.namaProduk;
-            gulaText.text = "Gula: " + currentProduct.gula + "g";
-            garamText.text = "Garam: " + currentProduct.garam + "g";
-            lemakText.text = "Lemak: " + currentProduct.lemak + "g";
+            if (namaProdukText != null) namaProdukText.text = " " + currentProduct.namaProduk;
+            if (produsenText != null) produsenText.text = currentProduct.asalProdusen;
+            if (kategoriText != null) kategoriText.text = currentProduct.kategoriProduk;
+            if (gulaText != null) gulaText.text = currentProduct.gula + "g";
+            if (garamText != null) garamText.text = currentProduct.garam + "g";
+            if (lemakText != null) lemakText.text = currentProduct.lemak + "g";
+        }
+
+        if (kandunganBerbahayaText != null)
+        {
+            kandunganBerbahayaText.text = "";
+            kandunganBerbahayaText.gameObject.SetActive(false);
         }
 
         if (foodRenderer != null && currentProduct.gambarMakanan != null)
@@ -150,6 +195,42 @@ public class CustomerManager : MonoBehaviour
         }
         
         GameManager.Instance.OnCustomerReady(currentProduct);
+    }
+
+    public void OnInvestigateButtonClicked()
+    {
+        if (hasInvestigated || GameManager.Instance.sudahDiCap) return;
+        hasInvestigated = true;
+
+        if (currentProduct.isPemalsuan)
+        {
+            customerRenderer.sprite = currentCustomer.spriteCemas;
+
+            RevealFakeData();
+
+            if (!string.IsNullOrEmpty(currentProduct.fungusFakeRevealMessage))
+            {
+                Flowchart.BroadcastFungusMessage(currentProduct.fungusFakeRevealMessage);
+            }
+        }
+        else
+        {
+            customerRenderer.sprite = currentCustomer.spriteMarah;
+            GameManager.Instance.ReduceTimer(5f);
+        }
+    }
+
+    public void RevealFakeData()
+    {
+        if (gulaText != null) gulaText.text = currentProduct.gulaAsli + "g";
+        if (garamText != null) garamText.text = currentProduct.garamAsli + "g";
+        if (lemakText != null) lemakText.text = currentProduct.lemakAsli + "g";
+
+        if (kandunganBerbahayaText != null && !string.IsNullOrEmpty(currentProduct.kandunganBerbahaya))
+        {
+            kandunganBerbahayaText.text = "ZAT TERLARANG: " + currentProduct.kandunganBerbahaya;
+            kandunganBerbahayaText.gameObject.SetActive(true);
+        }
     }
 
     public void EndCustomerSequence(bool isHappy)
@@ -203,6 +284,9 @@ public class CustomerManager : MonoBehaviour
         
         SetPaperTextVisible(false);
 
+        if (GameManager.Instance != null)
+            GameManager.Instance.SetHUDActive(false);
+
         // Setelah bersih-bersih, suruh GameManager memanggil pelanggan berikutnya
         GameManager.Instance.CheckDayProgress();
     }
@@ -227,8 +311,11 @@ public class CustomerManager : MonoBehaviour
     private void SetPaperTextVisible(bool isVisible)
     {
         if (namaProdukText != null) namaProdukText.gameObject.SetActive(isVisible);
+        if (produsenText != null) produsenText.gameObject.SetActive(isVisible);
+        if (kategoriText != null) kategoriText.gameObject.SetActive(isVisible);
         if (gulaText != null) gulaText.gameObject.SetActive(isVisible);
         if (garamText != null) garamText.gameObject.SetActive(isVisible);
         if (lemakText != null) lemakText.gameObject.SetActive(isVisible);
+        if (kandunganBerbahayaText != null && !isVisible) kandunganBerbahayaText.gameObject.SetActive(false);
     }
 }
