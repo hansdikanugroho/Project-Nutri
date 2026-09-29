@@ -13,8 +13,20 @@ MonoBehaviour:
   m_Name: Sale Pisang
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
   namaProduk: Sale Pisang
+  asalProdusen: UMKM
+  kategoriProduk: Makanan
   gambarMakanan: {fileID: 4329723807444408325, guid: a21ff153ad0b4b249999089198f23fd2, type: 3}
   gula: 20
   garam: 40
   lemak: 15
   levelSebenarnya: 0
+  isPemalsuan: 0
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
+  levelZatBerbahaya: 0
+  gulaAsli: 0
+  garamAsli: 0
+  lemakAsli: 0
+  levelAsli: 0
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

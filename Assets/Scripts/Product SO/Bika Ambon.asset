@@ -20,11 +20,13 @@ MonoBehaviour:
   garam: 10
   lemak: 60
   levelSebenarnya: 3
-  isPemalsuan: 0
-  kandunganBerbahaya: 
-  gulaAsli: 0
-  garamAsli: 0
-  lemakAsli: 0
-  levelAsli: 0
+  isPemalsuan: 1
+  kandunganBerbahaya: Narkoba
+  dampakZatBerbahaya: Narik Kolor Bapak
+  levelZatBerbahaya: 1
+  gulaAsli: 200
+  garamAsli: 1000
+  lemakAsli: 10000
+  levelAsli: 3
   fungusIntroMessage: 
   fungusFakeRevealMessage: 
