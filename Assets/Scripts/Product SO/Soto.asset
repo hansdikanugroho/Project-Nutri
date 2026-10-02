@@ -15,11 +15,14 @@ MonoBehaviour:
   namaProduk: Soto
   asalProdusen: SSB
   kategoriProduk: Makanan
+  jenisProdukNutri: 0
+  alamiTanpaGGL: 0
   gambarMakanan: {fileID: -8405469488588529400, guid: 36b9a799e0ab2d04db98f84939837721, type: 3}
   gula: 10
   garam: 200
-  lemak: 10
-  levelSebenarnya: 1
+  lemak: 2.8
+  jenisPemanis: 0
+  levelSebenarnya: 2
   isPemalsuan: 0
   kandunganBerbahaya: 
   dampakZatBerbahaya: 

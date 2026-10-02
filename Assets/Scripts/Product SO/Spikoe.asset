@@ -10,10 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
-  m_Name: Ciki 1
+  m_Name: Spikoe
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
-  namaProduk: Gembolo
-  gula: 33
-  garam: 34
-  lemak: 45
+  namaProduk: Spikoe
+  asalProdusen: UMKM Kue Surabaya
+  kategoriProduk: Kue
+  jenisProdukNutri: 0
+  alamiTanpaGGL: 0
+  gambarMakanan: {fileID: 0}
+  gula: 55
+  garam: 10
+  lemak: 50
+  jenisPemanis: 0
   levelSebenarnya: 3

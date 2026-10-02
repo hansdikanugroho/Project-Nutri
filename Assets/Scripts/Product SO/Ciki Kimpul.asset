@@ -10,10 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
-  m_Name: Ciki 2
+  m_Name: Ciki Kimpul
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
-  namaProduk: Sempol
-  gula: 10
-  garam: 20
-  lemak: 85
-  levelSebenarnya: 1
+  namaProduk: Ciki Kimpul
+  asalProdusen: UMKM Kimpul Nusantara
+  kategoriProduk: Camilan
+  jenisProdukNutri: 0
+  alamiTanpaGGL: 0
+  gambarMakanan: {fileID: 0}
+  gula: 21
+  garam: 24
+  lemak: 30
+  jenisPemanis: 0
+  levelSebenarnya: 3

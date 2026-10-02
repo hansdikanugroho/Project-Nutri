@@ -12,6 +12,25 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
     public Sprite idleSprite;
     public Sprite dragSprite;
 
+    [Tooltip("Mencegah sprite idle/drag terlihat gepeng atau memanjang.")]
+    [SerializeField] private bool preserveSpriteAspect = true;
+
+    [Tooltip("Aktifkan agar ukuran stamp saat di-drag bisa diatur dari Inspector.")]
+    [SerializeField] private bool useCustomDragSize = true;
+
+    [Tooltip("Ukuran RectTransform stamp saat di-drag.")]
+    [SerializeField] private Vector2 dragSize = new Vector2(150f, 150f);
+
+    [Header("Shadow Settings")]
+    [Tooltip("Boleh dikosongkan. Shadow akan dicari otomatis dari sibling yang namanya mengandung 'Shadow'.")]
+    [SerializeField] private RectTransform shadowRect;
+
+    [Tooltip("Jarak shadow dari stamp saat di-drag, dalam satuan UI Canvas.")]
+    [SerializeField] private Vector2 dragShadowOffset = new Vector2(10f, -10f);
+
+    [Tooltip("Gunakan sprite drag juga sebagai bentuk shadow agar tidak tetap berbentuk stamp berdiri.")]
+    [SerializeField] private bool shadowUsesDragSprite = true;
+
     [Header("Drop Target Feedback")]
     [Range(0f, 1f)] public float highlightStrength = 0.45f;
 
@@ -22,9 +41,19 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
     private Color targetHighlightColor;
 
     private Vector2 startAnchoredPosition;
+    private Vector2 startSizeDelta;
     private Vector3 startLocalScale;
     private int startSiblingIndex;
     private Transform startParent;
+
+    private Image shadowImage;
+    private Transform shadowStartParent;
+    private Vector2 shadowStartAnchoredPosition;
+    private Vector2 shadowStartSizeDelta;
+    private Vector3 shadowStartLocalScale;
+    private Quaternion shadowStartLocalRotation;
+    private int shadowStartSiblingIndex;
+    private Sprite shadowStartSprite;
 
     private Canvas canvas;
     private RectTransform canvasRect;
@@ -52,9 +81,12 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
         }
 
         startAnchoredPosition = rect.anchoredPosition;
+        startSizeDelta = rect.sizeDelta;
         startLocalScale = rect.localScale;
         startSiblingIndex = rect.GetSiblingIndex();
         startParent = rect.parent;
+
+        FindAndCacheShadow();
 
         canvas = GetComponentInParent<Canvas>();
         canvasRect = canvas != null ? canvas.transform as RectTransform : null;
@@ -65,6 +97,7 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
         if (stampImage != null)
         {
             stampImage.raycastTarget = true;
+            stampImage.preserveAspect = preserveSpriteAspect;
             if (idleSprite != null) stampImage.sprite = idleSprite;
         }
     }
@@ -212,7 +245,12 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
             if (dragSprite != null) stampImage.sprite = dragSprite;
             stampImage.color = new Color(1f, 1f, 1f, stampImage.color.a);
             stampImage.raycastTarget = false;
+            stampImage.preserveAspect = preserveSpriteAspect;
         }
+
+        ApplyDragSize();
+        ApplyDragShadowVisual();
+        SyncShadowPosition();
 
         SetHighlight(IsOverTarget(eventData.position) && CanAcceptDrop());
     }
@@ -220,9 +258,17 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
     private void PromoteToCanvasTop()
     {
         if (canvasRect == null) return;
-        if (rect.parent == canvasRect) return;
 
-        rect.SetParent(canvasRect, true);
+        if (shadowRect != null && shadowRect.parent != canvasRect)
+        {
+            shadowRect.SetParent(canvasRect, true);
+        }
+        if (shadowRect != null) shadowRect.SetAsLastSibling();
+
+        if (rect.parent != canvasRect)
+        {
+            rect.SetParent(canvasRect, true);
+        }
         rect.SetAsLastSibling();
     }
 
@@ -234,6 +280,7 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
         if (TryScreenToCanvasWorld(eventData.position, out worldPoint))
         {
             rect.position = worldPoint + grabOffset;
+            SyncShadowPosition();
         }
 
         SetHighlight(IsOverTarget(eventData.position) && CanAcceptDrop());
@@ -300,7 +347,111 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
 
         rect.SetSiblingIndex(startSiblingIndex);
         rect.anchoredPosition = startAnchoredPosition;
+        rect.sizeDelta = startSizeDelta;
         rect.localScale = startLocalScale;
+
+        RestoreShadow();
+    }
+
+    private void FindAndCacheShadow()
+    {
+        if (shadowRect == null && rect.parent != null)
+        {
+            string expectedName = name.Trim() + " Shadow";
+            Transform parent = rect.parent;
+
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                Transform candidate = parent.GetChild(i);
+                if (candidate == transform) continue;
+
+                bool nameMatches = candidate.name.Equals(expectedName, System.StringComparison.OrdinalIgnoreCase)
+                    || candidate.name.IndexOf("shadow", System.StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (nameMatches)
+                {
+                    shadowRect = candidate as RectTransform;
+                    if (shadowRect != null) break;
+                }
+            }
+        }
+
+        if (shadowRect == null) return;
+
+        shadowImage = shadowRect.GetComponent<Image>();
+        shadowStartParent = shadowRect.parent;
+        shadowStartAnchoredPosition = shadowRect.anchoredPosition;
+        shadowStartSizeDelta = shadowRect.sizeDelta;
+        shadowStartLocalScale = shadowRect.localScale;
+        shadowStartLocalRotation = shadowRect.localRotation;
+        shadowStartSiblingIndex = shadowRect.GetSiblingIndex();
+        shadowStartSprite = shadowImage != null ? shadowImage.sprite : null;
+
+        if (shadowImage != null)
+        {
+            shadowImage.raycastTarget = false;
+            shadowImage.preserveAspect = preserveSpriteAspect;
+        }
+    }
+
+    private void ApplyDragSize()
+    {
+        if (!useCustomDragSize) return;
+
+        rect.sizeDelta = new Vector2(
+            Mathf.Max(1f, dragSize.x),
+            Mathf.Max(1f, dragSize.y));
+    }
+
+    private void ApplyDragShadowVisual()
+    {
+        if (shadowRect == null) return;
+
+        shadowRect.sizeDelta = rect.sizeDelta;
+        shadowRect.rotation = rect.rotation;
+
+        if (shadowImage != null)
+        {
+            if (shadowUsesDragSprite && dragSprite != null)
+            {
+                shadowImage.sprite = dragSprite;
+            }
+            shadowImage.preserveAspect = preserveSpriteAspect;
+        }
+    }
+
+    private void SyncShadowPosition()
+    {
+        if (shadowRect == null || rect == null) return;
+
+        Vector3 worldOffset = canvasRect != null
+            ? canvasRect.TransformVector(new Vector3(dragShadowOffset.x, dragShadowOffset.y, 0f))
+            : new Vector3(dragShadowOffset.x, dragShadowOffset.y, 0f);
+
+        shadowRect.position = rect.position + worldOffset;
+    }
+
+    private void RestoreShadow()
+    {
+        if (shadowRect == null) return;
+
+        if (shadowStartParent != null && shadowRect.parent != shadowStartParent)
+        {
+            shadowRect.SetParent(shadowStartParent, true);
+        }
+
+        shadowRect.SetSiblingIndex(shadowStartSiblingIndex);
+        shadowRect.anchoredPosition = shadowStartAnchoredPosition;
+        shadowRect.sizeDelta = shadowStartSizeDelta;
+        shadowRect.localScale = shadowStartLocalScale;
+        shadowRect.localRotation = shadowStartLocalRotation;
+
+        if (shadowImage != null)
+        {
+            shadowImage.sprite = shadowStartSprite;
+            shadowImage.raycastTarget = false;
+            shadowImage.preserveAspect = preserveSpriteAspect;
+        }
     }
 
     private void SetHighlight(bool value)

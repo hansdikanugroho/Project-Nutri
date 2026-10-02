@@ -10,15 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff4227539419d0f489246393bf661894, type: 3}
-  m_Name: Boss
+  m_Name: Boss Hard
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
-  namaCustomer: Boss
+  namaCustomer: Boss Hard
   spriteNetral: {fileID: 6701063624276941839, guid: a4f7ca4a8bd09cf419e3f9fe72802bf8, type: 3}
   spriteSenang: {fileID: -7429847798839914438, guid: 56d730a385722414c9bff89daa9192ad, type: 3}
   spriteMarah: {fileID: 6336469331982006229, guid: d5897697b9f381846b044f929cf5c1cf, type: 3}
   spriteCemas: {fileID: 0}
   possibleProducts:
-  - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
-  canTriggerEvent: 0
-  eventProbability: 0.2
+  - {fileID: 11400000, guid: d81f4f24f09d486a9dbde75d9d93ed6d, type: 2}
+  - {fileID: 11400000, guid: 9818e0f8ee68410f8f0ca8afc9d170ea, type: 2}
+  - {fileID: 11400000, guid: 15fda5af01cf4e7bbc6f7765613f24a2, type: 2}
+  - {fileID: 11400000, guid: 538e6f0e09d94b33832968f7a1963ec6, type: 2}
+  - {fileID: 11400000, guid: 357b7f12132e4ca4eb69d7a0810fa5be, type: 2}
+  canTriggerEvent: 1
+  eventProbability: 0.6
   fungusMessageToTrigger: EventSuap_01

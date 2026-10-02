@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 using System.Collections;
 
 [System.Serializable]
@@ -73,6 +74,7 @@ public class DayNightController : MonoBehaviour
     {
         if (gloomOverlayCanvas != null)
         {
+            DisableOverlayRaycasts();
             gloomOverlayCanvas.SetActive(isNight);
         }
 
@@ -91,6 +93,7 @@ public class DayNightController : MonoBehaviour
         // Paksa nyalakan canvas gloom overlay buat nambah kesan berat/tegang
         if (gloomOverlayCanvas != null)
         {
+            DisableOverlayRaycasts();
             gloomOverlayCanvas.SetActive(true);
         }
 
@@ -104,6 +107,24 @@ public class DayNightController : MonoBehaviour
         }
 
         StartTransition(bossEvent);
+    }
+
+    private void DisableOverlayRaycasts()
+    {
+        if (gloomOverlayCanvas == null) return;
+
+        Graphic[] overlayGraphics = gloomOverlayCanvas.GetComponentsInChildren<Graphic>(true);
+        foreach (Graphic graphic in overlayGraphics)
+        {
+            graphic.raycastTarget = false;
+        }
+
+        CanvasGroup[] overlayGroups = gloomOverlayCanvas.GetComponentsInChildren<CanvasGroup>(true);
+        foreach (CanvasGroup group in overlayGroups)
+        {
+            group.blocksRaycasts = false;
+            group.interactable = false;
+        }
     }
 
     // Fungsi ini dipanggil oleh CustomerManager untuk waktu normal

@@ -11,16 +11,43 @@ public class GGLIntroController : MonoBehaviour
 
     private void Awake()
     {
-        resumeTimeScale = Time.timeScale > 0f ? Time.timeScale : 1f;
         transform.localScale = Vector3.one;
 
         if (closeButton != null)
         {
             closeButton.onClick.AddListener(CloseIntro);
         }
+    }
 
+    private void OnEnable()
+    {
+        transform.localScale = Vector3.one;
+        if (panelKecil != null) panelKecil.SetActive(false);
+
+        PauseGame();
+    }
+
+    private void PauseGame()
+    {
+        if (isPausingGame) return;
+
+        resumeTimeScale = Time.timeScale > 0f ? Time.timeScale : 1f;
         Time.timeScale = 0f;
         isPausingGame = true;
+    }
+
+    public void OpenLargePanel()
+    {
+        transform.localScale = Vector3.one;
+        if (panelKecil != null) panelKecil.SetActive(false);
+
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+            return;
+        }
+
+        PauseGame();
     }
 
     public void CloseIntro()
@@ -33,10 +60,13 @@ public class GGLIntroController : MonoBehaviour
         if (panelKecil != null) panelKecil.SetActive(true);
     }
 
-    public void OpenLargePanel()
+    private void OnDisable()
     {
-        gameObject.SetActive(true);
-        if (panelKecil != null) panelKecil.SetActive(false);
+        // Tetap pulihkan waktu bila panel dimatikan dari Inspector/script lain.
+        if (!isPausingGame) return;
+
+        isPausingGame = false;
+        Time.timeScale = resumeTimeScale;
     }
 
     private void OnDestroy()

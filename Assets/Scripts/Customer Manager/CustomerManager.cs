@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Fungus; 
 
 public class CustomerManager : MonoBehaviour
@@ -19,6 +20,7 @@ public class CustomerManager : MonoBehaviour
     private CustomerData currentCustomer;
     private ProductData currentProduct;
     private bool hasInvestigated = false;
+    private Coroutine investigationRoutine;
     private Coroutine revealRoutine;
     private readonly List<Coroutine> revealChildren = new List<Coroutine>();
     private int revealRunning;
@@ -41,6 +43,7 @@ public class CustomerManager : MonoBehaviour
     public TextMeshProUGUI kandunganBerbahayaText;
 
     [Header("Reveal Effect")]
+    public InvestigationNoirController investigationNoir;
     public RectTransform shakeTarget;
     public AudioClip revealSFX;
     public float revealStrikeDelay = 0.35f;
@@ -97,7 +100,7 @@ public class CustomerManager : MonoBehaviour
     void Start()
     {
         if (GameManager.Instance != null)
-            GameManager.Instance.SetHUDActive(false);
+            GameManager.Instance.SetHUDActive(true);
         if (foodObject != null) foodObject.SetActive(false);
     }
 
@@ -118,6 +121,34 @@ public class CustomerManager : MonoBehaviour
         }
     }
 
+    public void ResetForNewDay()
+    {
+        StopInvestigationRoutine();
+        StopRevealRoutine();
+        hasInvestigated = false;
+        currentCustomer = null;
+        currentProduct = null;
+
+        ResetFadeColors();
+
+        if (paperUI != null)
+        {
+            paperUI.alpha = 1f;
+            paperUI.interactable = true;
+            paperUI.blocksRaycasts = true;
+        }
+
+        if (paperContainer != null)
+        {
+            paperContainer.transform.localScale = Vector3.one;
+            paperContainer.SetActive(false);
+        }
+
+        if (customerObject != null) customerObject.SetActive(false);
+        if (foodObject != null) foodObject.SetActive(false);
+        SetPaperTextVisible(false);
+    }
+
     public void StartCustomerSequence()
     {
         StartCoroutine(SpawnSequence());
@@ -125,7 +156,7 @@ public class CustomerManager : MonoBehaviour
 
     private IEnumerator SpawnSequence()
     {
-        paperContainer.SetActive(false);
+        if (paperContainer != null) paperContainer.SetActive(false);
         if (foodObject != null) foodObject.SetActive(false);
         ResetFadeColors();
 
@@ -144,9 +175,11 @@ public class CustomerManager : MonoBehaviour
             currentCustomer = dailyCustomerQueue[0];
             dailyCustomerQueue.RemoveAt(0); 
 
-            if (currentCustomer.possibleProducts.Length > 0)
+            currentProduct = SelectEligibleProduct(currentCustomer.possibleProducts);
+            if (currentProduct == null)
             {
-                currentProduct = currentCustomer.possibleProducts[Random.Range(0, currentCustomer.possibleProducts.Length)];
+                Debug.LogError($"Customer '{currentCustomer.name}' tidak memiliki minuman yang memenuhi syarat Nutri-Level Kemenkes 301/2026.");
+                yield break;
             }
 
             customerRenderer.sprite = currentCustomer.spriteNetral;
@@ -173,7 +206,13 @@ public class CustomerManager : MonoBehaviour
             cColor.a = 1f;
             customerRenderer.color = cColor;
 
-            if (currentCustomer.canTriggerEvent && Random.value <= currentCustomer.eventProbability)
+            float eventProbability = currentCustomer.eventProbability;
+            if (GameManager.Instance != null)
+            {
+                eventProbability += GameManager.Instance.CurrentEventProbabilityBonus;
+            }
+
+            if (currentCustomer.canTriggerEvent && Random.value <= Mathf.Clamp01(eventProbability))
             {
                 Flowchart.BroadcastFungusMessage(currentCustomer.fungusMessageToTrigger);
                 yield break; 
@@ -202,17 +241,18 @@ public class CustomerManager : MonoBehaviour
 
     public void ShowPaperAndStartTimer()
     {
+        StopInvestigationRoutine();
         hasInvestigated = false;
         StopRevealRoutine();
 
         if (currentCustomer.possibleProducts.Length > 0 && currentProduct != null)
         {
-            if (namaProdukText != null) namaProdukText.text = " " + currentProduct.namaProduk;
-            if (produsenText != null) produsenText.text = currentProduct.asalProdusen;
-            if (kategoriText != null) kategoriText.text = currentProduct.kategoriProduk;
-            if (gulaText != null) gulaText.text = currentProduct.gula + "g";
-            if (garamText != null) garamText.text = currentProduct.garam + "g";
-            if (lemakText != null) lemakText.text = currentProduct.lemak + "g";
+            SetSingleLineText(namaProdukText, currentProduct.namaProduk);
+            SetSingleLineText(produsenText, currentProduct.asalProdusen);
+            SetSingleLineText(kategoriText, currentProduct.kategoriProduk);
+            if (gulaText != null) gulaText.text = FormatNutrient(currentProduct.gula, "g");
+            if (garamText != null) garamText.text = FormatNutrient(currentProduct.garam, "mg");
+            if (lemakText != null) lemakText.text = FormatNutrient(currentProduct.lemak, "g");
         }
 
         if (kandunganBerbahayaText != null)
@@ -228,7 +268,12 @@ public class CustomerManager : MonoBehaviour
 
         if (foodObject != null) foodObject.SetActive(true);
 
-        paperContainer.SetActive(true);
+        ResetFadeColors();
+        if (paperContainer != null)
+        {
+            paperContainer.transform.localScale = Vector3.one;
+            paperContainer.SetActive(true);
+        }
         SetPaperTextVisible(true);
 
         if (audioSource != null && paperSpawnSFX != null)
@@ -243,6 +288,21 @@ public class CustomerManager : MonoBehaviour
     {
         if (hasInvestigated || GameManager.Instance.sudahDiCap) return;
         hasInvestigated = true;
+
+        investigationRoutine = StartCoroutine(InvestigateCurrentProduct());
+    }
+
+    private IEnumerator InvestigateCurrentProduct()
+    {
+        if (investigationNoir != null)
+        {
+            yield return investigationNoir.PlayInvestigation();
+            investigationNoir.StopInvestigationInstant();
+        }
+        else
+        {
+            yield return new WaitForSecondsRealtime(0.8f);
+        }
 
         bool adaPemalsuan = currentProduct.isPemalsuan;
         bool adaZatBerbahaya = !string.IsNullOrEmpty(currentProduct.kandunganBerbahaya);
@@ -261,8 +321,11 @@ public class CustomerManager : MonoBehaviour
         else
         {
             customerRenderer.sprite = currentCustomer.spriteMarah;
+            if (investigationNoir != null) investigationNoir.PlayDisappointedReaction();
             GameManager.Instance.ReduceTimer(5f);
         }
+
+        investigationRoutine = null;
     }
 
     public void RevealTrueData()
@@ -289,9 +352,9 @@ public class CustomerManager : MonoBehaviour
 
         if (currentProduct.isPemalsuan)
         {
-            SpawnRevealField(gulaText, currentProduct.gula + "g", currentProduct.gulaAsli + "g");
-            SpawnRevealField(garamText, currentProduct.garam + "g", currentProduct.garamAsli + "g");
-            SpawnRevealField(lemakText, currentProduct.lemak + "g", currentProduct.lemakAsli + "g");
+            SpawnRevealField(gulaText, FormatNutrient(currentProduct.gula, "g"), FormatNutrient(currentProduct.gulaAsli, "g"));
+            SpawnRevealField(garamText, FormatNutrient(currentProduct.garam, "mg"), FormatNutrient(currentProduct.garamAsli, "mg"));
+            SpawnRevealField(lemakText, FormatNutrient(currentProduct.lemak, "g"), FormatNutrient(currentProduct.lemakAsli, "g"));
         }
 
         while (revealRunning > 0) yield return null;
@@ -360,8 +423,20 @@ public class CustomerManager : MonoBehaviour
         if (hadReveal && shakeTarget != null) shakeTarget.anchoredPosition = shakeBasePosition;
     }
 
+    private void StopInvestigationRoutine()
+    {
+        if (investigationRoutine != null)
+        {
+            StopCoroutine(investigationRoutine);
+            investigationRoutine = null;
+        }
+
+        if (investigationNoir != null) investigationNoir.StopInvestigationInstant();
+    }
+
     public void EndCustomerSequence(bool isHappy)
     {
+        StopInvestigationRoutine();
         StopRevealRoutine();
         StartCoroutine(EndSequence(isHappy));
     }
@@ -403,7 +478,7 @@ public class CustomerManager : MonoBehaviour
         SetPaperTextVisible(false);
 
         if (GameManager.Instance != null)
-            GameManager.Instance.SetHUDActive(false);
+            GameManager.Instance.SetHUDActive(true);
 
         // Setelah bersih-bersih, suruh GameManager memanggil pelanggan berikutnya
         GameManager.Instance.CheckDayProgress();
@@ -443,5 +518,42 @@ public class CustomerManager : MonoBehaviour
         if (garamText != null) garamText.gameObject.SetActive(isVisible);
         if (lemakText != null) lemakText.gameObject.SetActive(isVisible);
         if (kandunganBerbahayaText != null && !isVisible) kandunganBerbahayaText.gameObject.SetActive(false);
+    }
+
+    private static ProductData SelectEligibleProduct(ProductData[] products)
+    {
+        if (products == null || products.Length == 0) return null;
+
+        List<ProductData> eligibleProducts = new List<ProductData>();
+        for (int i = 0; i < products.Length; i++)
+        {
+            ProductData product = products[i];
+            if (product != null && product.CanReceiveNutriLevel())
+            {
+                eligibleProducts.Add(product);
+            }
+        }
+
+        return eligibleProducts.Count > 0
+            ? eligibleProducts[Random.Range(0, eligibleProducts.Count)]
+            : null;
+    }
+
+    private static void SetSingleLineText(TextMeshProUGUI label, string value)
+    {
+        if (label == null) return;
+
+        label.enableAutoSizing = true;
+        label.fontSizeMin = 16f;
+        label.fontSizeMax = 26f;
+        label.textWrappingMode = TextWrappingModes.NoWrap;
+        label.overflowMode = TextOverflowModes.Ellipsis;
+        label.text = string.IsNullOrWhiteSpace(value) ? "-" : value.Trim();
+    }
+
+    private static string FormatNutrient(float value, string unit)
+    {
+        string number = Mathf.Max(0f, value).ToString("0.##", CultureInfo.InvariantCulture).Replace('.', ',');
+        return number + unit;
     }
 }
