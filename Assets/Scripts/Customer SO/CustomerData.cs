@@ -10,12 +10,17 @@ public class CustomerData : ScriptableObject
     public Sprite spriteSenang;
     public Sprite spriteMarah;
     public Sprite spriteCemas;
+    public Sprite spriteProtes;
     
     [Header("Daftar Produk Bawaan")]
-    public ProductData[] possibleProducts; // SO Produk dimasukkan ke sini
+    public ProductData[] possibleProducts;
 
     [Header("Fungus Random Event")]
     public bool canTriggerEvent;
-    [Range(0f, 1f)] public float eventProbability = 0.2f; // 0.2 = 20% peluang
-    public string fungusMessageToTrigger = "EventSuap_01"; // Pesan penanda untuk Fungus
+    [Range(0f, 1f)] public float eventProbability = 0.2f;
+    public string fungusMessageToTrigger = "EventSuap_01";
+
+    [Header("Fungus Appeal & Protes")]
+    public bool canAppeal = true;
+    public string fungusAppealMessage = "EventBanding_01";
 }

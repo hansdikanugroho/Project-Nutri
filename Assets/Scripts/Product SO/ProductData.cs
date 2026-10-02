@@ -16,9 +16,14 @@ public class ProductData : ScriptableObject
 
     [Header("Data Pemalsuan (Investigasi)")]
     public bool isPemalsuan;
-    public string kandunganBerbahaya; // e.g., "Formalin", "Boraks", "Rhodamin B", "Pemanis Buatan Berlebih"
-    public string dampakZatBerbahaya; // e.g., "Iritasi & gangguan saluran pencernaan"
+    public string kandunganBerbahaya;
+    public string dampakZatBerbahaya;
     public DangerLevel levelZatBerbahaya;
+
+    [Header("Zat Terlarang & Penolakan")]
+    public bool wajibDitolak;
+    public bool adaZatTerlarang;
+    public int penaltiTolakSalah = 15;
 
     [Header("Data Asli (Jika Pemalsuan)")]
     public int gulaAsli;

@@ -29,6 +29,7 @@ public class CustomerManager : MonoBehaviour
     public Image paperImage;
     public Image stampAreaImage;
     public CanvasGroup paperUI;
+    public Button rejectButton;
     
     [Header("Paper Text References")]
     public TextMeshProUGUI namaProdukText;
@@ -58,6 +59,34 @@ public class CustomerManager : MonoBehaviour
     [Header("Audio Setup")]
     public AudioSource audioSource;
     public AudioClip paperSpawnSFX;
+
+    public CustomerData GetCurrentCustomer()
+    {
+        return currentCustomer;
+    }
+
+    public void ShowProtestVisual()
+    {
+        if (customerRenderer == null || currentCustomer == null) return;
+        customerRenderer.sprite = currentCustomer.spriteProtes != null ? currentCustomer.spriteProtes : currentCustomer.spriteMarah;
+    }
+
+    public void ReopenForAppeal()
+    {
+        hasInvestigated = false;
+        if (customerRenderer != null && currentCustomer != null)
+        {
+            customerRenderer.sprite = currentCustomer.spriteNetral;
+        }
+    }
+
+    public void OnRejectButtonClicked()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RejectProduct();
+        }
+    }
 
     void Awake()
     {
