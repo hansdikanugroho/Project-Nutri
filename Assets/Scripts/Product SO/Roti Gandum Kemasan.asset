@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
+  m_Name: Roti Gandum Kemasan
+  m_EditorClassIdentifier: Assembly-CSharp::ProductData
+  namaProduk: Roti Gandum Kemasan
+  asalProdusen: PT Roti Sehat
+  kategoriProduk: Makanan
+  jenisProdukNutri: 0
+  alamiTanpaGGL: 0
+  gambarMakanan: {fileID: 0}
+  gula: 4
+  garam: 120
+  lemak: 1.2
+  jenisPemanis: 0
+  levelSebenarnya: 1
+  isPemalsuan: 0
+  kandunganBerbahaya:
+  dampakZatBerbahaya:
+  levelZatBerbahaya: 0
+  gulaAsli: 0
+  garamAsli: 0
+  lemakAsli: 0
+  levelAsli: 0
+  fungusIntroMessage:
+  fungusFakeRevealMessage:

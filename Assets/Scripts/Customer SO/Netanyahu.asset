@@ -10,15 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff4227539419d0f489246393bf661894, type: 3}
-  m_Name: Londo
+  m_Name: Netanyahu
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
-  namaCustomer: Londo
-  spriteNetral: {fileID: 6523796539754339270, guid: 0f5fb22a462b81d4bac886b58d1d7f41, type: 3}
-  spriteSenang: {fileID: -1656370391497003811, guid: b07b7a4b354075d49854c4878a19c0ff, type: 3}
-  spriteMarah: {fileID: 6523796539754339270, guid: 0f5fb22a462b81d4bac886b58d1d7f41, type: 3}
+  namaCustomer: Netanyahu
+  spriteNetral: {fileID: -7744603480918732714, guid: b4ade9299aaa4ad49a15d2219da2a271, type: 3}
+  spriteSenang: {fileID: 0}
+  spriteMarah: {fileID: 256885810310362222, guid: cff5ba9344404c448a6e7c208808c0f8, type: 3}
+  spriteCemas: {fileID: -7854956670836696326, guid: 92fc16596d778064fa38080b6b7611ea, type: 3}
   possibleProducts:
-  - {fileID: 11400000, guid: e60d73dd3686de6449f2a250cc682b37, type: 2}
   - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
+  - {fileID: 11400000, guid: bfb4d1f94a1204448b5e21f69a28b0a4, type: 2}
+  - {fileID: 11400000, guid: e60d73dd3686de6449f2a250cc682b37, type: 2}
+  - {fileID: 11400000, guid: 357b7f12132e4ca4eb69d7a0810fa5be, type: 2}
   canTriggerEvent: 0
   eventProbability: 0.2
   fungusMessageToTrigger: EventSuap_01

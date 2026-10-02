@@ -176,7 +176,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Lemak
+  m_text: Lemak Jenuh
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 750e2044791817c4e8b7fa031bf48ef1, type: 2}
   m_sharedMaterial: {fileID: 5795935080297494112, guid: 750e2044791817c4e8b7fa031bf48ef1, type: 2}
@@ -7802,7 +7802,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1357010463267254405, guid: cdecc0e46fd3923499d0bfaced1395b0, type: 3}
+  m_Sprite: {fileID: 1357010463267254405, guid: 0f4394734a984c38b6c58e10b2490404, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -19970,10 +19970,12 @@ MonoBehaviour:
   timerSlider: {fileID: 506388228}
   currentDay: 1
   dayConfigurations:
-  - targetCustomers: 1
+  - targetCustomers: 3
     customerPatience: 20
     dayCustomerDatabase:
-    - {fileID: 11400000, guid: f484535894215784e84e58026fa04132, type: 2}
+    - {fileID: 11400000, guid: aac68edbd7e85174fac99c2ee03392ea, type: 2}
+    - {fileID: 11400000, guid: 3b4a0b10993dda645b420410ef2c714b, type: 2}
+    - {fileID: 11400000, guid: 3d2c9cf08b9638f469cb0c942d867f47, type: 2}
   dayReportPanel: {fileID: 1816711626}
   dayTitleText: {fileID: 90517618}
   reputationResultText: {fileID: 860259955}
@@ -22071,6 +22073,12 @@ MonoBehaviour:
   dropPadding: 60
   idleSprite: {fileID: 7785669342496006158, guid: d668f7bdb6ef7d342beda84f0a401b33, type: 3}
   dragSprite: {fileID: -5610121155824500873, guid: 15d0f23802ffb674b8f9d82655240b25, type: 3}
+  preserveSpriteAspect: 1
+  useCustomDragSize: 1
+  dragSize: {x: 150, y: 150}
+  shadowRect: {fileID: 0}
+  dragShadowOffset: {x: 10, y: -10}
+  shadowUsesDragSprite: 1
   highlightStrength: 0.45
 --- !u!1 &1900000330
 GameObject:
@@ -22277,6 +22285,12 @@ MonoBehaviour:
   dropPadding: 60
   idleSprite: {fileID: 8658513488024162194, guid: 41e91cd1a54ac4541b269f11ecbf76f3, type: 3}
   dragSprite: {fileID: 224260439625319653, guid: 9db6f9ada1eee5a4f877aa808e23ef9d, type: 3}
+  preserveSpriteAspect: 1
+  useCustomDragSize: 1
+  dragSize: {x: 150, y: 150}
+  shadowRect: {fileID: 0}
+  dragShadowOffset: {x: 10, y: -10}
+  shadowUsesDragSprite: 1
   highlightStrength: 0.45
 --- !u!1 &1900000360
 GameObject:
@@ -22483,6 +22497,12 @@ MonoBehaviour:
   dropPadding: 60
   idleSprite: {fileID: 298201449278483224, guid: 896b8c06238f3ca49acf24b93ce53a8b, type: 3}
   dragSprite: {fileID: 187239945195407983, guid: 935208633a0e7e5488c50ab95ee10614, type: 3}
+  preserveSpriteAspect: 1
+  useCustomDragSize: 1
+  dragSize: {x: 150, y: 150}
+  shadowRect: {fileID: 0}
+  dragShadowOffset: {x: 10, y: -10}
+  shadowUsesDragSprite: 1
   highlightStrength: 0.45
 --- !u!1 &1900000390
 GameObject:
@@ -22689,6 +22709,12 @@ MonoBehaviour:
   dropPadding: 60
   idleSprite: {fileID: 4444084174460226746, guid: fd94bb307c20ec24cb35421fed6b0bb6, type: 3}
   dragSprite: {fileID: -4559620476116256921, guid: a73b202635ac4914c9e6d42c7c9230fd, type: 3}
+  preserveSpriteAspect: 1
+  useCustomDragSize: 1
+  dragSize: {x: 150, y: 150}
+  shadowRect: {fileID: 0}
+  dragShadowOffset: {x: 10, y: -10}
+  shadowUsesDragSprite: 1
   highlightStrength: 0.45
 --- !u!1 &1909033479
 GameObject:

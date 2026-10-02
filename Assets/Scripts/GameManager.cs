@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     [Header("Day Cycle System")]
     public int currentDay = 1;
     public DayConfig[] dayConfigurations; 
+    public float CurrentEventProbabilityBonus { get; private set; }
     private int currentCustomersPerDay;
     private int customersServedToday = 0;
     
@@ -172,6 +173,7 @@ public class GameManager : MonoBehaviour
     public void StartNewDay()
     {
         SetHUDActive(false);
+        CurrentEventProbabilityBonus = 0f;
         dailyReputationChange = 0;
         customersServedToday = 0;
         hasRecordedThisCustomer = false;
@@ -186,6 +188,7 @@ public class GameManager : MonoBehaviour
 
             currentCustomersPerDay = currentConfig.targetCustomers;
             currentCustomerPatience = currentConfig.customerPatience;
+            CurrentEventProbabilityBonus = currentConfig.eventProbabilityBonus;
 
             if (currentConfig.dayCustomerDatabase != null && currentConfig.dayCustomerDatabase.Length > 0)
             {
@@ -254,8 +257,15 @@ public class GameManager : MonoBehaviour
 
         if (!mustReject && activeProduct != null)
         {
-            NutriLevel expectedLevel = activeProduct.levelSebenarnya;
-            isCorrect = (appliedLevel == expectedLevel);
+            NutriLevel expectedLevel;
+            if (activeProduct.TryCalculateNutriLevel(out expectedLevel))
+            {
+                isCorrect = (appliedLevel == expectedLevel);
+            }
+            else
+            {
+                Debug.LogError($"Produk '{activeProduct.namaProduk}' bukan minuman yang memenuhi syarat Nutri-Level Kemenkes 301/2026.");
+            }
         }
 
         HandleVerdictResult(isCorrect, false);
@@ -407,7 +417,7 @@ public class GameManager : MonoBehaviour
                 wasRejected = pendingWasRejected,
                 isTimeout = pendingWasTimeout,
                 appliedLevel = pendingAppliedLevel,
-                expectedLevel = activeProduct.levelSebenarnya,
+                expectedLevel = activeProduct.CalculateNutriLevel(),
                 isCorrect = isHappy,
                 wasPemalsuan = activeProduct.isPemalsuan,
                 kandunganBerbahaya = activeProduct.kandunganBerbahaya ?? string.Empty,
@@ -714,7 +724,7 @@ public class GameManager : MonoBehaviour
         zatRt.anchorMin = new Vector2(0.05f, 0.38f); zatRt.anchorMax = new Vector2(0.95f, 0.67f);
         zatRt.offsetMin = Vector2.zero; zatRt.offsetMax = Vector2.zero;
         TextMeshProUGUI zatTmp = zatObj.GetComponent<TextMeshProUGUI>();
-        zatTmp.fontSize = 15; zatTmp.alignment = TextAlignmentOptions.TopLeft; zatTmp.enableWordWrapping = true;
+        zatTmp.fontSize = 15; zatTmp.alignment = TextAlignmentOptions.TopLeft; zatTmp.textWrappingMode = TextWrappingModes.Normal;
 
         GameObject prodObj = new GameObject("ProdukText", typeof(RectTransform), typeof(TextMeshProUGUI));
         prodObj.transform.SetParent(box.transform, false);
@@ -722,7 +732,7 @@ public class GameManager : MonoBehaviour
         prodRt.anchorMin = new Vector2(0.05f, 0.14f); prodRt.anchorMax = new Vector2(0.95f, 0.37f);
         prodRt.offsetMin = Vector2.zero; prodRt.offsetMax = Vector2.zero;
         TextMeshProUGUI prodTmp = prodObj.GetComponent<TextMeshProUGUI>();
-        prodTmp.fontSize = 14; prodTmp.alignment = TextAlignmentOptions.TopLeft; prodTmp.enableWordWrapping = true;
+        prodTmp.fontSize = 14; prodTmp.alignment = TextAlignmentOptions.TopLeft; prodTmp.textWrappingMode = TextWrappingModes.Normal;
 
         GameObject btnObj = new GameObject("ContinueButton", typeof(RectTransform), typeof(Image), typeof(Button));
         btnObj.transform.SetParent(box.transform, false);
@@ -828,5 +838,6 @@ public class DayConfig
 {
     public int targetCustomers;
     public float customerPatience;
+    [Range(0f, 1f)] public float eventProbabilityBonus;
     public CustomerData[] dayCustomerDatabase;
 }

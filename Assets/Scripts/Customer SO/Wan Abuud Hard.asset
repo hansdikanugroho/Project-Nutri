@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff4227539419d0f489246393bf661894, type: 3}
+  m_Name: Wan Abuud Hard
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerData
+  namaCustomer: Wan Abuud Hard
+  spriteNetral: {fileID: 3498265718595599744, guid: 673b2685e6e3a5e4e977216e21acb9c1, type: 3}
+  spriteSenang: {fileID: 3498265718595599744, guid: 673b2685e6e3a5e4e977216e21acb9c1, type: 3}
+  spriteMarah: {fileID: 3498265718595599744, guid: 673b2685e6e3a5e4e977216e21acb9c1, type: 3}
+  spriteCemas: {fileID: 0}
+  possibleProducts:
+  - {fileID: 11400000, guid: d81f4f24f09d486a9dbde75d9d93ed6d, type: 2}
+  - {fileID: 11400000, guid: 9818e0f8ee68410f8f0ca8afc9d170ea, type: 2}
+  - {fileID: 11400000, guid: 15fda5af01cf4e7bbc6f7765613f24a2, type: 2}
+  - {fileID: 11400000, guid: 538e6f0e09d94b33832968f7a1963ec6, type: 2}
+  - {fileID: 11400000, guid: 357b7f12132e4ca4eb69d7a0810fa5be, type: 2}
+  canTriggerEvent: 1
+  eventProbability: 0.4
+  fungusMessageToTrigger: EventSuap_01
