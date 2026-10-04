@@ -208,6 +208,8 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
     private bool CanInteract()
     {
         if (Time.timeScale == 0f) return false;
+        if (TutorialFlowController.Instance != null)
+            return !TutorialFlowController.Instance.HasDecided;
         return GameManager.Instance != null && !GameManager.Instance.sudahDiCap;
     }
 
@@ -217,6 +219,8 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
 
         if (targetStampArea == null) return false;
         if (!targetStampArea.gameObject.activeInHierarchy) return false;
+        if (TutorialFlowController.Instance != null)
+            return TutorialFlowController.Instance.IsProcessing;
         return GameManager.Instance != null && GameManager.Instance.isProcessing;
     }
 
@@ -316,6 +320,12 @@ public class StampController : MonoBehaviour, IPointerDownHandler, IBeginDragHan
 
     private void CommitStamp()
     {
+        if (TutorialFlowController.Instance != null)
+        {
+            TutorialFlowController.Instance.ProcessDecision(stampLevel);
+            return;
+        }
+
         if (GameManager.Instance == null) return;
         GameManager.Instance.ProcessDecision(stampLevel);
     }

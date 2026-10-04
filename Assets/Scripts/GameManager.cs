@@ -21,16 +21,6 @@ public class GameManager : MonoBehaviour
 
     private ProductData activeProduct; 
 
-    [Header("Banding & Penolakan")]
-    public GameObject appealPanel;
-    public Button appealReviewButton;
-    public Button appealInsistButton;
-    public TextMeshProUGUI appealMessageText;
-    public float appealTimerMultiplier = 0.6f;
-    public int penaltiBandingGanda = 25;
-
-    private bool appealUsed = false;
-    private bool isAppealWindow = false;
     private bool hasEndedThisCustomer = false;
     private bool pendingWasRejected = false;
     private bool pendingIsCorrect = false;
@@ -69,6 +59,19 @@ public class GameManager : MonoBehaviour
     public GameObject spPopupPanel;
     public TextMeshProUGUI spTitleText;
     public TextMeshProUGUI spMessageText;
+
+    [Header("Toast Notification UI")]
+    public GameObject toastPanel;
+    public CanvasGroup toastCanvasGroup;
+    public UnityEngine.UI.Image toastBackgroundImage;
+    public UnityEngine.UI.Image toastIconImage;
+    public TextMeshProUGUI toastMainText;
+    public TextMeshProUGUI toastSubText;
+    public Sprite successIcon;
+    public Sprite rejectIcon;
+    public Color successBgColor = Color.white;
+    public Color rejectBgColor = new Color(1f, 0.8f, 0.8f, 1f);
+    private Coroutine toastRoutine;
 
     [Header("Reputation Bar System")]
     public int maxReputation = 100;
@@ -224,13 +227,11 @@ public class GameManager : MonoBehaviour
         activeProduct = productData;
         sudahDiCap = false;
         isProcessing = true;
-        appealUsed = false;
-        isAppealWindow = false;
         hasEndedThisCustomer = false;
         hasRecordedThisCustomer = false;
         pendingWasTimeout = false;
         pendingWasRejected = false;
-        if (appealPanel != null) appealPanel.SetActive(false);
+        pendingIsCorrect = false;
         currentTimer = activeProduct != null && activeProduct.adaZatTerlarang ? currentCustomerPatience * 0.7f : currentCustomerPatience;
     }
 
@@ -255,9 +256,65 @@ public class GameManager : MonoBehaviour
             || product.adaZatTerlarang;
     }
 
+    private IEnumerator ShowToastRoutine(bool wasStamped, string levelName)
+    {
+        if (toastPanel == null || toastCanvasGroup == null) yield break;
+
+        if (wasStamped)
+        {
+            if (toastMainText != null) toastMainText.text = "Produk Disetujui.";
+            if (toastSubText != null) toastSubText.text = "Nutri Level " + levelName + " Telah Diberikan.";
+            if (toastBackgroundImage != null) toastBackgroundImage.color = successBgColor;
+            if (toastIconImage != null) toastIconImage.sprite = successIcon;
+        }
+        else
+        {
+            if (toastMainText != null) toastMainText.text = "Produk Ditolak.";
+            if (toastSubText != null) toastSubText.text = "Gagal memenuhi standar kelayakan.";
+            if (toastBackgroundImage != null) toastBackgroundImage.color = rejectBgColor;
+            if (toastIconImage != null) toastIconImage.sprite = rejectIcon;
+        }
+
+        toastCanvasGroup.alpha = 0f;
+        toastPanel.SetActive(true);
+
+        float elapsed = 0f;
+        float duration = 0.3f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            toastCanvasGroup.alpha = Mathf.Clamp01(elapsed / duration);
+            yield return null;
+        }
+        toastCanvasGroup.alpha = 1f;
+
+        yield return new WaitForSeconds(2f);
+
+        elapsed = 0f;
+        duration = 0.5f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            toastCanvasGroup.alpha = Mathf.Clamp01(1f - (elapsed / duration));
+            yield return null;
+        }
+        toastCanvasGroup.alpha = 0f;
+
+        toastPanel.SetActive(false);
+    }
+
     public void ProcessDecision(NutriLevel appliedLevel)
     {
         if (sudahDiCap || !isProcessing || hasEndedThisCustomer) return;
+
+        if (TutorialFlowController.Instance != null)
+        {
+            TutorialFlowController.Instance.NotifyDecisionMade(false, appliedLevel);
+        }
+
+        bool isApproved = (appliedLevel != NutriLevel.D);
+        if (toastRoutine != null) StopCoroutine(toastRoutine);
+        toastRoutine = StartCoroutine(ShowToastRoutine(isApproved, appliedLevel.ToString()));
 
         sudahDiCap = true;
         isProcessing = false;
@@ -280,6 +337,14 @@ public class GameManager : MonoBehaviour
     public void RejectProduct()
     {
         if (sudahDiCap || !isProcessing || hasEndedThisCustomer) return;
+
+        if (TutorialFlowController.Instance != null)
+        {
+            TutorialFlowController.Instance.NotifyDecisionMade(true, NutriLevel.D);
+        }
+
+        if (toastRoutine != null) StopCoroutine(toastRoutine);
+        toastRoutine = StartCoroutine(ShowToastRoutine(false, "D"));
 
         sudahDiCap = true;
         isProcessing = false;
@@ -305,88 +370,27 @@ public class GameManager : MonoBehaviour
                 reward = 15;
             }
             dailyReputationChange += reward;
-            FinalizeCustomer(true);
+            FinalizeCustomer(true, wasRejected);
         }
         else
         {
-            CustomerData currentCust = CustomerManager.Instance != null ? CustomerManager.Instance.GetCurrentCustomer() : null;
-            bool canAppeal = currentCust != null && currentCust.canAppeal && !appealUsed;
-
-            if (canAppeal)
-            {
-                TriggerAppeal();
-            }
-            else
-            {
-                int penalty = appealUsed ? penaltiBandingGanda : (activeProduct != null && activeProduct.penaltiTolakSalah > 0 ? activeProduct.penaltiTolakSalah : 15);
-                dailyReputationChange -= penalty;
-                FinalizeCustomer(false);
-            }
+            int penalty = (activeProduct != null && activeProduct.penaltiTolakSalah > 0 ? activeProduct.penaltiTolakSalah : 15);
+            dailyReputationChange -= penalty;
+            FinalizeCustomer(false, wasRejected);
         }
     }
 
-    private void TriggerAppeal()
-    {
-        isAppealWindow = true;
-        CustomerManager.Instance.ShowProtestVisual();
-
-        if (appealPanel != null)
-        {
-            appealPanel.SetActive(true);
-            if (appealMessageText != null)
-            {
-                appealMessageText.text = pendingWasRejected 
-                    ? "Pelanggan memprotes penolakan berkas! Tinjau ulang atau tegaskan keputusan?" 
-                    : "Pelanggan komplain nilai cap salah! Tinjau ulang atau pertahankan nilai?";
-            }
-        }
-        else
-        {
-            OnAppealInsist();
-        }
-    }
-
-    public void OnAppealReview()
-    {
-        if (!isAppealWindow) return;
-        isAppealWindow = false;
-        appealUsed = true;
-
-        if (appealPanel != null) appealPanel.SetActive(false);
-
-        sudahDiCap = false;
-        isProcessing = true;
-        currentTimer = currentCustomerPatience * appealTimerMultiplier;
-
-        if (CustomerManager.Instance != null)
-        {
-            CustomerManager.Instance.ReopenForAppeal();
-        }
-    }
-
-    public void OnAppealInsist()
-    {
-        if (!isAppealWindow && appealUsed) return;
-        isAppealWindow = false;
-
-        if (appealPanel != null) appealPanel.SetActive(false);
-
-        pendingIsCorrect = false;
-        int penalty = appealUsed ? penaltiBandingGanda : 15;
-        dailyReputationChange -= penalty;
-        FinalizeCustomer(false);
-    }
-
-    private void FinalizeCustomer(bool isHappy)
+    private void FinalizeCustomer(bool isHappy, bool wasRejected)
     {
         if (hasEndedThisCustomer) return;
         hasEndedThisCustomer = true;
-        isAppealWindow = false;
-        if (appealPanel != null) appealPanel.SetActive(false);
 
         RecordCustomerDecision(isHappy);
 
-        CustomerManager.Instance.EndCustomerSequence(isHappy);
+        if (CustomerManager.Instance != null)
+        {
+            CustomerManager.Instance.EndCustomerSequence(isHappy, wasRejected, pendingIsCorrect);
+        }
     }
 
     private void RecordCustomerDecision(bool isHappy)
@@ -459,7 +463,7 @@ public class GameManager : MonoBehaviour
         
         dailyReputationChange -= 20;
         
-        FinalizeCustomer(false);
+        FinalizeCustomer(false, false);
     }
 
     public void CheckDayProgress()

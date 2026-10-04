@@ -51,6 +51,9 @@ public class StampDropArea : MonoBehaviour, IDropHandler, IDragHandler
         if (!IsReady) return false;
         if (!acceptOnlyWhileProcessing) return true;
 
+        if (TutorialFlowController.Instance != null)
+            return TutorialFlowController.Instance.IsProcessing;
+
         return GameManager.Instance != null
             && GameManager.Instance.isProcessing
             && !GameManager.Instance.sudahDiCap;
