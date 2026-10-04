@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
+  m_Name: Oatmeal Tawar
+  m_EditorClassIdentifier: Assembly-CSharp::ProductData
+  namaProduk: Oatmeal Tawar
+  asalProdusen: Pangan Sehat
+  kategoriProduk: Sarapan
+  gambarMakanan: {fileID: 2631783834788630941, guid: 5bf9726bb46185943a4a642b2500a7c0, type: 3}
+  jenisProdukNutri: 0
+  alamiTanpaGGL: 0
+  gula: 1
+  garam: 5
+  lemak: 0.7
+  jenisPemanis: 0
+  levelSebenarnya: 0
+  isPemalsuan: 0
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
+  levelZatBerbahaya: 0
+  wajibDitolak: 0
+  adaZatTerlarang: 0
+  penaltiTolakSalah: 15
+  gulaAsli: 0
+  garamAsli: 0
+  lemakAsli: 0
+  jenisPemanisAsli: 0
+  levelAsli: 0
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

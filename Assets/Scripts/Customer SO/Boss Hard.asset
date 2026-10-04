@@ -19,10 +19,23 @@ MonoBehaviour:
   spriteMarah: {fileID: 6336469331982006229, guid: d5897697b9f381846b044f929cf5c1cf, type: 3}
   spriteCemas: {fileID: 0}
   possibleProducts:
-  - {fileID: 11400000, guid: bfb4d1f94a1204448b5e21f69a28b0a4, type: 2}
-  - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
-  - {fileID: 11400000, guid: e60d73dd3686de6449f2a250cc682b37, type: 2}
-  - {fileID: 11400000, guid: 357b7f12132e4ca4eb69d7a0810fa5be, type: 2}
+  - {fileID: 11400000, guid: 8f710d9160354d6c853515e7d39149c1, type: 2}
+  - {fileID: 11400000, guid: e4ec64ed55104eb8b1a003b9cfbeba80, type: 2}
+  - {fileID: 11400000, guid: e8bb0102a60b42ba9b0217d42c2e0c06, type: 2}
+  - {fileID: 11400000, guid: 6ef30ce9a9b74d90a9fd8eedba139fa1, type: 2}
+  - {fileID: 11400000, guid: a9d9b5a60b334d948165b6d21b22dc75, type: 2}
+  - {fileID: 11400000, guid: f9343535ab4945a0be303f29f2c5738b, type: 2}
+  - {fileID: 11400000, guid: ad006e22fdef4120aa086a97663c7dce, type: 2}
+  - {fileID: 11400000, guid: 5f71128787ea42ad997f5693f5875dcf, type: 2}
+  - {fileID: 11400000, guid: 34ae64a2357443e3a53688bd9ea16e4c, type: 2}
+  - {fileID: 11400000, guid: dfc8c714d2e345fc8dbbd5e53b8f889f, type: 2}
+  - {fileID: 11400000, guid: 76b5734a40394130a436d8b0d08c1d52, type: 2}
+  - {fileID: 11400000, guid: 749bd9b523c54ae0b8ad2bb834648e2a, type: 2}
+  - {fileID: 11400000, guid: 0d5e65f063f74f828d76115745876390, type: 2}
+  - {fileID: 11400000, guid: 41ea5b7100044c539841fca075e6181c, type: 2}
+  - {fileID: 11400000, guid: c64ef3498bd44377864ae70e2fcbba6f, type: 2}
+  - {fileID: 11400000, guid: 61529cf6ab824a2fa6308bc8216e7094, type: 2}
+  - {fileID: 11400000, guid: 1e635627bd3840fda8bc602fbad6fea6, type: 2}
   canTriggerEvent: 1
   eventProbability: 0.6
   fungusMessageToTrigger: EventSuap_01

@@ -18,6 +18,9 @@ public class TutorialFlowController : MonoBehaviour
     public bool createFallbackData = true;
     public bool useRealStampController = true;
 
+    [Header("Scene Flow")]
+    [SerializeField] private string mainGameSceneName = "Main Dev_2Nopal";
+
     private ProductData fallbackSafeProduct;
     private ProductData fallbackDangerousProduct;
     private CustomerData fallbackCustomer1;
@@ -121,7 +124,13 @@ public class TutorialFlowController : MonoBehaviour
 
     public void FinishTutorialAndLoadMainDev()
     {
-        SceneManager.LoadScene("Main Dev");
+        if (!Application.CanStreamedLevelBeLoaded(mainGameSceneName))
+        {
+            Debug.LogError($"Scene tujuan tutorial '{mainGameSceneName}' belum terdaftar di Build Profiles.", this);
+            return;
+        }
+
+        SceneManager.LoadScene(mainGameSceneName);
     }
 
     private void CreateFallbackDataIfMissing()

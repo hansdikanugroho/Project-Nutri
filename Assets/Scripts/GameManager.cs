@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
     private NutriLevel pendingAppliedLevel = NutriLevel.A;
     
     [Header("Stamp Statistics")]
+    [Min(1)]
     public int daysPerWeek = 7;
     private readonly List<StampRecord> stampHistory = new List<StampRecord>();
     private readonly List<DayStampStats> dayStatsHistory = new List<DayStampStats>();
@@ -40,7 +41,10 @@ public class GameManager : MonoBehaviour
 
     [Header("Day Cycle System")]
     public int currentDay = 1;
-    public DayConfig[] dayConfigurations; 
+    [Tooltip("Konfigurasi utama: satu elemen adalah satu minggu, masing-masing berisi tujuh hari.")]
+    public WeekConfig[] weekConfigurations;
+    [HideInInspector]
+    public DayConfig[] dayConfigurations;
     public float CurrentEventProbabilityBonus { get; private set; }
     private int currentCustomersPerDay;
     private int customersServedToday = 0;
@@ -184,11 +188,8 @@ public class GameManager : MonoBehaviour
         if (dayReportPanel != null) dayReportPanel.SetActive(false);
         if (spPopupPanel != null) spPopupPanel.SetActive(false);
         
-        if (dayConfigurations != null && dayConfigurations.Length > 0)
+        if (TryGetDayConfiguration(currentDay, out DayConfig currentConfig))
         {
-            int configIndex = Mathf.Clamp(currentDay - 1, 0, dayConfigurations.Length - 1);
-            DayConfig currentConfig = dayConfigurations[configIndex];
-
             currentCustomersPerDay = currentConfig.targetCustomers;
             currentCustomerPatience = currentConfig.customerPatience;
             CurrentEventProbabilityBonus = currentConfig.eventProbabilityBonus;
@@ -213,6 +214,11 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
+        }
+        else
+        {
+            Debug.LogError($"Konfigurasi untuk hari {currentDay} tidak ditemukan.");
+            return;
         }
         
         Debug.Log("Hari ke-" + currentDay + " Dimulai!");
@@ -327,7 +333,7 @@ public class GameManager : MonoBehaviour
 
         if (!mustReject && activeProduct != null)
         {
-            NutriLevel expectedLevel = activeProduct.CalculateNutriLevel();
+            NutriLevel expectedLevel = activeProduct.GetGameplayLevel();
             isCorrect = appliedLevel == expectedLevel;
         }
 
@@ -427,7 +433,7 @@ public class GameManager : MonoBehaviour
                 wasRejected = pendingWasRejected,
                 isTimeout = pendingWasTimeout,
                 appliedLevel = pendingAppliedLevel,
-                expectedLevel = activeProduct.CalculateNutriLevel(),
+                expectedLevel = activeProduct.GetGameplayLevel(),
                 isCorrect = isHappy,
                 wasPemalsuan = activeProduct.isPemalsuan,
                 kandunganBerbahaya = activeProduct.kandunganBerbahaya ?? string.Empty,
@@ -600,6 +606,12 @@ public class GameManager : MonoBehaviour
 
         if (currentSPLevel >= 3)
         {
+            bool isWeekEnd = daysPerWeek > 0 && currentDay % daysPerWeek == 0;
+            if (isWeekEnd && TryShowWeeklyReport(currentDay / daysPerWeek, true))
+            {
+                yield break;
+            }
+
             Debug.Log("[DEBUG EOD] SP Level 3 - Game Over! Loading Finish scene...");
             SceneManager.LoadScene("Finish");
         }
@@ -630,7 +642,7 @@ public class GameManager : MonoBehaviour
         ProceedToNextDay();
     }
 
-    private bool TryShowWeeklyReport(int weekNumber)
+    private bool TryShowWeeklyReport(int weekNumber, bool finishAfterReport = false)
     {
         if (weeklyReportController == null)
         {
@@ -653,11 +665,26 @@ public class GameManager : MonoBehaviour
             List<StampRecord> weekRecords = stampHistory.FindAll(r => r.day >= startDay && r.day <= endDay);
             List<DayStampStats> weekDayStats = dayStatsHistory.FindAll(s => s.day >= startDay && s.day <= endDay);
 
-            weeklyReportController.Show(weekNumber, weekRecords, weekDayStats, () =>
-            {
-                isWeeklyReportOpen = false;
-                ProceedToNextDay();
-            });
+            weeklyReportController.Show(
+                weekNumber,
+                daysPerWeek,
+                weekRecords,
+                weekDayStats,
+                reputation,
+                maxReputation,
+                currentSPLevel,
+                () =>
+                {
+                    isWeeklyReportOpen = false;
+                    if (finishAfterReport)
+                    {
+                        SceneManager.LoadScene("Finish");
+                    }
+                    else
+                    {
+                        ProceedToNextDay();
+                    }
+                });
             return true;
         }
 
@@ -668,7 +695,7 @@ public class GameManager : MonoBehaviour
     {
         if (dayReportPanel != null) dayReportPanel.SetActive(false);
 
-        if (currentDay >= dayConfigurations.Length)
+        if (currentDay >= GetTotalConfiguredDays())
         {
             Debug.Log("All days completed! Loading Finish scene...");
             SceneManager.LoadScene("Finish");
@@ -677,6 +704,52 @@ public class GameManager : MonoBehaviour
 
         currentDay++;
         StartNewDay();
+    }
+
+    private bool TryGetDayConfiguration(int day, out DayConfig config)
+    {
+        config = null;
+        if (day < 1) return false;
+
+        int safeDaysPerWeek = Mathf.Max(1, daysPerWeek);
+        if (weekConfigurations != null && weekConfigurations.Length > 0)
+        {
+            int weekIndex = (day - 1) / safeDaysPerWeek;
+            int dayIndex = (day - 1) % safeDaysPerWeek;
+            if (weekIndex >= 0 && weekIndex < weekConfigurations.Length)
+            {
+                WeekConfig week = weekConfigurations[weekIndex];
+                if (week != null && week.days != null && dayIndex < week.days.Length)
+                {
+                    config = week.days[dayIndex];
+                    if (config != null) return true;
+                }
+            }
+        }
+
+        // Fallback untuk scene lama yang masih memakai array 21 hari datar.
+        if (dayConfigurations != null && day <= dayConfigurations.Length)
+        {
+            config = dayConfigurations[day - 1];
+            return config != null;
+        }
+
+        return false;
+    }
+
+    private int GetTotalConfiguredDays()
+    {
+        if (weekConfigurations != null && weekConfigurations.Length > 0)
+        {
+            int total = 0;
+            foreach (WeekConfig week in weekConfigurations)
+            {
+                if (week != null && week.days != null) total += week.days.Length;
+            }
+            if (total > 0) return total;
+        }
+
+        return dayConfigurations != null ? dayConfigurations.Length : 0;
     }
 
     private WeeklyReportPanel AutoCreateWeeklyReportPanel()
@@ -850,4 +923,12 @@ public class DayConfig
     public float customerPatience;
     [Range(0f, 1f)] public float eventProbabilityBonus;
     public CustomerData[] dayCustomerDatabase;
+}
+
+[System.Serializable]
+public class WeekConfig
+{
+    public string weekName = "Minggu Baru";
+    [Tooltip("Isi tepat tujuh elemen untuk satu minggu permainan.")]
+    public DayConfig[] days = new DayConfig[7];
 }
