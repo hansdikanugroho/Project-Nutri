@@ -10,10 +10,14 @@ public class CustomerManager : MonoBehaviour
 {
     public static CustomerManager Instance;
 
-    private CustomerData[] todayCustomers;
+    private readonly List<CustomerData> todayCustomers = new List<CustomerData>();
 
     [Header("Time & Queue System")]
     public DayNightController timeController; 
+
+    [Header("Difficulty Progression")]
+    [Min(1)] public int lastEasyDay = 7;
+    [Min(2)] public int lastNormalDay = 15;
     private List<CustomerData> dailyCustomerQueue = new List<CustomerData>();
     private int totalCustomersToday;
 
@@ -41,6 +45,11 @@ public class CustomerManager : MonoBehaviour
     public TextMeshProUGUI garamText;
     public TextMeshProUGUI lemakText;
     public TextMeshProUGUI kandunganBerbahayaText;
+
+    [Header("Hazard Notification")]
+    public GameObject hazardNotificationPanel;
+    public TextMeshProUGUI hazardNotificationTitle;
+    public TextMeshProUGUI hazardNotificationMessage;
 
     [Header("Reveal Effect")]
     public InvestigationNoirController investigationNoir;
@@ -71,7 +80,7 @@ public class CustomerManager : MonoBehaviour
     public void ShowProtestVisual()
     {
         if (customerRenderer == null || currentCustomer == null) return;
-        customerRenderer.sprite = currentCustomer.spriteProtes != null ? currentCustomer.spriteProtes : currentCustomer.spriteMarah;
+        customerRenderer.sprite = currentCustomer.GetProtestSprite();
     }
 
     public void ReopenForAppeal()
@@ -79,7 +88,7 @@ public class CustomerManager : MonoBehaviour
         hasInvestigated = false;
         if (customerRenderer != null && currentCustomer != null)
         {
-            customerRenderer.sprite = currentCustomer.spriteNetral;
+            customerRenderer.sprite = currentCustomer.GetNeutralSprite();
         }
     }
 
@@ -95,6 +104,7 @@ public class CustomerManager : MonoBehaviour
     {
         Instance = this;
         SetPaperTextVisible(false);
+        HideHazardNotification();
     }
 
     void Start()
@@ -104,25 +114,75 @@ public class CustomerManager : MonoBehaviour
         if (foodObject != null) foodObject.SetActive(false);
     }
 
-    public void SetTodayCustomers(CustomerData[] customersForToday)
+    public int SetTodayCustomers(CustomerData[] customersForToday, int currentDay)
     {
-        if (customersForToday == null || customersForToday.Length == 0) return;
-        todayCustomers = customersForToday;
+        todayCustomers.Clear();
+        if (customersForToday == null) return 0;
+
+        CustomerDifficulty expectedDifficulty = GetDifficultyForDay(currentDay);
+
+        for (int i = 0; i < customersForToday.Length; i++)
+        {
+            CustomerData customer = customersForToday[i];
+            if (customer == null)
+            {
+                Debug.LogWarning($"Slot customer ke-{i + 1} kosong dan dilewati.");
+                continue;
+            }
+
+            if (customer.difficulty != expectedDifficulty)
+            {
+                Debug.LogWarning(
+                    $"Customer '{customer.name}' bertier {customer.difficulty}, " +
+                    $"tetapi hari {currentDay} membutuhkan tier {expectedDifficulty}. Customer dilewati.");
+                continue;
+            }
+
+            if (!customer.HasPlayableProduct())
+            {
+                Debug.LogWarning($"Customer '{customer.name}' dilewati karena belum memiliki Product SO dengan sprite.");
+                continue;
+            }
+
+            todayCustomers.Add(customer);
+        }
+
+        return todayCustomers.Count;
+    }
+
+    public CustomerDifficulty GetDifficultyForDay(int day)
+    {
+        int easyLimit = Mathf.Max(1, lastEasyDay);
+        int normalLimit = Mathf.Max(easyLimit + 1, lastNormalDay);
+
+        if (day <= easyLimit) return CustomerDifficulty.Easy;
+        if (day <= normalLimit) return CustomerDifficulty.Normal;
+        return CustomerDifficulty.Hard;
     }
 
     public void GenerateDailyQueue()
     {
         dailyCustomerQueue.Clear();
-        totalCustomersToday = todayCustomers.Length;
+        totalCustomersToday = todayCustomers.Count;
 
         for (int i = 0; i < totalCustomersToday; i++)
         {
             dailyCustomerQueue.Add(todayCustomers[i]);
         }
+
+        // Fisher-Yates: urutan pelanggan tidak selalu sama walau pool hari sama.
+        for (int i = dailyCustomerQueue.Count - 1; i > 0; i--)
+        {
+            int swapIndex = Random.Range(0, i + 1);
+            CustomerData temp = dailyCustomerQueue[i];
+            dailyCustomerQueue[i] = dailyCustomerQueue[swapIndex];
+            dailyCustomerQueue[swapIndex] = temp;
+        }
     }
 
     public void ResetForNewDay()
     {
+        HideHazardNotification();
         StopInvestigationRoutine();
         StopRevealRoutine();
         hasInvestigated = false;
@@ -156,6 +216,7 @@ public class CustomerManager : MonoBehaviour
 
     private IEnumerator SpawnSequence()
     {
+        HideHazardNotification();
         if (paperContainer != null) paperContainer.SetActive(false);
         if (foodObject != null) foodObject.SetActive(false);
         ResetFadeColors();
@@ -175,14 +236,14 @@ public class CustomerManager : MonoBehaviour
             currentCustomer = dailyCustomerQueue[0];
             dailyCustomerQueue.RemoveAt(0); 
 
-            currentProduct = SelectEligibleProduct(currentCustomer.possibleProducts);
+            currentProduct = SelectPlayableProduct(currentCustomer.possibleProducts);
             if (currentProduct == null)
             {
-                Debug.LogError($"Customer '{currentCustomer.name}' tidak memiliki minuman yang memenuhi syarat Nutri-Level Kemenkes 301/2026.");
+                Debug.LogError($"Customer '{currentCustomer.name}' tidak memiliki Product SO dengan sprite yang siap dimainkan.");
                 yield break;
             }
 
-            customerRenderer.sprite = currentCustomer.spriteNetral;
+            customerRenderer.sprite = currentCustomer.GetNeutralSprite();
 
             // 1. Set initial alpha to 0
             Color cColor = customerRenderer.color;
@@ -241,6 +302,7 @@ public class CustomerManager : MonoBehaviour
 
     public void ShowPaperAndStartTimer()
     {
+        HideHazardNotification();
         StopInvestigationRoutine();
         hasInvestigated = false;
         StopRevealRoutine();
@@ -309,7 +371,7 @@ public class CustomerManager : MonoBehaviour
 
         if (adaPemalsuan || adaZatBerbahaya)
         {
-            customerRenderer.sprite = currentCustomer.spriteCemas;
+            customerRenderer.sprite = currentCustomer.GetWorriedSprite();
 
             RevealTrueData();
 
@@ -320,7 +382,7 @@ public class CustomerManager : MonoBehaviour
         }
         else
         {
-            customerRenderer.sprite = currentCustomer.spriteMarah;
+            customerRenderer.sprite = currentCustomer.GetAngrySprite();
             if (investigationNoir != null) investigationNoir.PlayDisappointedReaction();
             GameManager.Instance.ReduceTimer(5f);
         }
@@ -377,29 +439,44 @@ public class CustomerManager : MonoBehaviour
 
     private void ShowHazardousSubstance()
     {
-        if (kandunganBerbahayaText == null) return;
-        if (string.IsNullOrEmpty(currentProduct.kandunganBerbahaya))
+        if (kandunganBerbahayaText != null)
         {
             kandunganBerbahayaText.text = "";
             kandunganBerbahayaText.gameObject.SetActive(false);
+        }
+
+        if (currentProduct == null || string.IsNullOrWhiteSpace(currentProduct.kandunganBerbahaya))
+        {
+            HideHazardNotification();
             return;
         }
 
-        string line = "ZAT TERLARANG: " + currentProduct.kandunganBerbahaya;
+        if (hazardNotificationTitle != null)
+        {
+            hazardNotificationTitle.text = "BAHAN BERBAHAYA TERDETEKSI!";
+        }
+
+        string message = currentProduct.kandunganBerbahaya.Trim();
 
         if (currentProduct.levelZatBerbahaya != DangerLevel.TidakAda)
         {
-            string color = currentProduct.levelZatBerbahaya == DangerLevel.Tinggi ? "#FF4444" : "#FFA500";
-            line += "  <color=" + color + ">" + currentProduct.levelZatBerbahaya.ToString().ToUpper() + "</color>";
+            string color = currentProduct.levelZatBerbahaya == DangerLevel.Tinggi ? "#991B1B" : "#A85D00";
+            message += "  <color=" + color + "><b>" + currentProduct.levelZatBerbahaya.ToString().ToUpper() + "</b></color>";
         }
 
-        if (!string.IsNullOrEmpty(currentProduct.dampakZatBerbahaya))
+        if (!string.IsNullOrWhiteSpace(currentProduct.dampakZatBerbahaya))
         {
-            line += " — " + currentProduct.dampakZatBerbahaya;
+            message += "\nRisiko: " + currentProduct.dampakZatBerbahaya.Trim();
         }
 
-        kandunganBerbahayaText.text = line;
-        kandunganBerbahayaText.gameObject.SetActive(true);
+        if (hazardNotificationMessage != null) hazardNotificationMessage.text = message;
+        if (hazardNotificationPanel != null) hazardNotificationPanel.SetActive(true);
+    }
+
+    private void HideHazardNotification()
+    {
+        if (hazardNotificationMessage != null) hazardNotificationMessage.text = "";
+        if (hazardNotificationPanel != null) hazardNotificationPanel.SetActive(false);
     }
 
     private void StopRevealRoutine()
@@ -436,6 +513,7 @@ public class CustomerManager : MonoBehaviour
 
     public void EndCustomerSequence(bool isHappy)
     {
+        HideHazardNotification();
         StopInvestigationRoutine();
         StopRevealRoutine();
         StartCoroutine(EndSequence(isHappy));
@@ -443,7 +521,7 @@ public class CustomerManager : MonoBehaviour
 
     private IEnumerator EndSequence(bool isHappy)
     {
-        customerRenderer.sprite = isHappy ? currentCustomer.spriteSenang : currentCustomer.spriteMarah;
+        customerRenderer.sprite = isHappy ? currentCustomer.GetHappySprite() : currentCustomer.GetAngrySprite();
         
         yield return new WaitForSeconds(1.5f); 
 
@@ -520,23 +598,23 @@ public class CustomerManager : MonoBehaviour
         if (kandunganBerbahayaText != null && !isVisible) kandunganBerbahayaText.gameObject.SetActive(false);
     }
 
-    private static ProductData SelectEligibleProduct(ProductData[] products)
+    private static ProductData SelectPlayableProduct(ProductData[] products)
     {
         if (products == null || products.Length == 0) return null;
 
-        List<ProductData> eligibleProducts = new List<ProductData>();
+        ProductData selected = null;
+        int playableCount = 0;
+
         for (int i = 0; i < products.Length; i++)
         {
             ProductData product = products[i];
-            if (product != null && product.CanReceiveNutriLevel())
-            {
-                eligibleProducts.Add(product);
-            }
+            if (product == null || product.gambarMakanan == null) continue;
+
+            playableCount++;
+            if (Random.Range(0, playableCount) == 0) selected = product;
         }
 
-        return eligibleProducts.Count > 0
-            ? eligibleProducts[Random.Range(0, eligibleProducts.Count)]
-            : null;
+        return selected;
     }
 
     private static void SetSingleLineText(TextMeshProUGUI label, string value)

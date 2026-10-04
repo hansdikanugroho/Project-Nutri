@@ -13,15 +13,13 @@ MonoBehaviour:
   m_Name: Boss Medium
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
   namaCustomer: Boss Medium
+  difficulty: 1
   spriteNetral: {fileID: 6701063624276941839, guid: a4f7ca4a8bd09cf419e3f9fe72802bf8, type: 3}
   spriteSenang: {fileID: -7429847798839914438, guid: 56d730a385722414c9bff89daa9192ad, type: 3}
   spriteMarah: {fileID: 6336469331982006229, guid: d5897697b9f381846b044f929cf5c1cf, type: 3}
   spriteCemas: {fileID: 0}
   possibleProducts:
-  - {fileID: 11400000, guid: 31d0f4525a9749ee835c612f74029e97, type: 2}
-  - {fileID: 11400000, guid: 90b8148c09134d6eaed785e7184bba94, type: 2}
-  - {fileID: 11400000, guid: 4af7aeb5d96b42709cfa3b4dd472addf, type: 2}
-  - {fileID: 11400000, guid: dc1e585e010c44d79e3cb9a94f5f0e86, type: 2}
+  - {fileID: 11400000, guid: bfb4d1f94a1204448b5e21f69a28b0a4, type: 2}
   - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
   - {fileID: 11400000, guid: e60d73dd3686de6449f2a250cc682b37, type: 2}
   canTriggerEvent: 1

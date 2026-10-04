@@ -10,26 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
-  m_Name: Kopi Susu Gula Aren Kekinian
+  m_Name: Mie Goreng Instan
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
-  namaProduk: Kopi Susu Aren
-  asalProdusen: Kedai Kopi Nusantara
-  kategoriProduk: Minuman
-  jenisProdukNutri: 1
+  namaProduk: Mie Goreng Instan
+  asalProdusen: PT Pangan Instan
+  kategoriProduk: Makanan
+  jenisProdukNutri: 0
   alamiTanpaGGL: 0
   gambarMakanan: {fileID: 0}
-  gula: 35
-  garam: 50
-  lemak: 12
-  jenisPemanis: 1
-  levelSebenarnya: 3
+  gula: 3
+  garam: 480
+  lemak: 2.8
+  jenisPemanis: 0
+  levelSebenarnya: 2
   isPemalsuan: 0
-  kandunganBerbahaya:
-  dampakZatBerbahaya:
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
   levelZatBerbahaya: 0
   gulaAsli: 0
   garamAsli: 0
   lemakAsli: 0
   levelAsli: 0
-  fungusIntroMessage:
-  fungusFakeRevealMessage:
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

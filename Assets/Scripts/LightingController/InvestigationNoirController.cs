@@ -17,6 +17,12 @@ public class InvestigationNoirController : MonoBehaviour
     [SerializeField] private RectTransform selectiveColorRoot;
     [SerializeField] private Shader grayscaleUIShader;
 
+    [Header("Sorot Investigation")]
+    [SerializeField] private Light2D investigationLight;
+    [SerializeField] private Transform spotlightTarget;
+    [SerializeField, Min(0f)] private float spotlightIntensity = 2.3f;
+    [SerializeField] private Vector2 spotlightOffset = new Vector2(0.3f, 4.15f);
+
     [Header("Noir Ringan")]
     [SerializeField, Min(0.1f)] private float investigationDuration = 1.1f;
     [SerializeField, Min(0f)] private float fadeInDuration = 0.25f;
@@ -50,6 +56,8 @@ public class InvestigationNoirController : MonoBehaviour
             cameraData = targetCamera.GetComponent<UniversalAdditionalCameraData>();
         }
 
+        DisableSpotlight();
+
         CreateRuntimeVolume();
 
         if (grayscaleUIShader != null)
@@ -66,6 +74,7 @@ public class InvestigationNoirController : MonoBehaviour
     {
         SetUIGrayscale(true);
         effectActive = true;
+        PrepareSpotlight();
 
         if (cameraData != null)
         {
@@ -81,16 +90,19 @@ public class InvestigationNoirController : MonoBehaviour
             elapsed += Time.unscaledDeltaTime;
             float amount = fadeInDuration <= 0f ? 1f : Mathf.Clamp01(elapsed / fadeInDuration);
             SetEffectAmount(amount);
+            SetSpotlightAmount(amount);
             yield return null;
         }
 
         SetEffectAmount(1f);
+        SetSpotlightAmount(1f);
         float holdDuration = Mathf.Max(0f, investigationDuration - fadeInDuration);
         if (holdDuration > 0f) yield return new WaitForSecondsRealtime(holdDuration);
     }
 
     public void StopInvestigationInstant()
     {
+        DisableSpotlight();
         if (!effectActive && originalUIMaterials.Count == 0) return;
 
         SetEffectAmount(0f);
@@ -139,16 +151,27 @@ public class InvestigationNoirController : MonoBehaviour
 
     private void UpdateVignetteCenter()
     {
-        if (runtimeProfile == null || selectiveColorRoot == null) return;
+        if (runtimeProfile == null) return;
         if (!runtimeProfile.TryGet(out Vignette vignette)) return;
 
-        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null, selectiveColorRoot.position);
+        Vector2 screenPoint;
+        if (spotlightTarget != null && targetCamera != null)
+        {
+            screenPoint = targetCamera.WorldToScreenPoint(spotlightTarget.position + Vector3.up * 0.8f);
+        }
+        else if (selectiveColorRoot != null)
+        {
+            screenPoint = RectTransformUtility.WorldToScreenPoint(null, selectiveColorRoot.position);
+        }
+        else
+        {
+            screenPoint = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        }
+
         Vector2 normalized = new Vector2(
             Screen.width > 0 ? screenPoint.x / Screen.width : 0.5f,
             Screen.height > 0 ? screenPoint.y / Screen.height : 0.5f);
 
-        // Sedikit dinaikkan agar terasa seperti sorot lampu dari atas.
-        normalized.y = Mathf.Clamp01(normalized.y + 0.07f);
         vignette.center.Override(normalized);
     }
 
@@ -186,6 +209,38 @@ public class InvestigationNoirController : MonoBehaviour
     {
         if (noirVolume != null) noirVolume.weight = amount;
         if (grayscaleUIMaterial != null) grayscaleUIMaterial.SetFloat(EffectAmountId, amount);
+    }
+
+    private void PrepareSpotlight()
+    {
+        if (investigationLight == null) return;
+
+        if (spotlightTarget != null)
+        {
+            Vector3 targetPosition = spotlightTarget.position;
+            investigationLight.transform.position = new Vector3(
+                targetPosition.x + spotlightOffset.x,
+                targetPosition.y + spotlightOffset.y,
+                investigationLight.transform.position.z);
+        }
+
+        investigationLight.gameObject.SetActive(true);
+        investigationLight.enabled = true;
+        investigationLight.intensity = 0f;
+    }
+
+    private void SetSpotlightAmount(float amount)
+    {
+        if (investigationLight == null || !investigationLight.gameObject.activeSelf) return;
+        investigationLight.intensity = Mathf.SmoothStep(0f, spotlightIntensity, Mathf.Clamp01(amount));
+    }
+
+    private void DisableSpotlight()
+    {
+        if (investigationLight == null) return;
+        investigationLight.intensity = 0f;
+        investigationLight.enabled = false;
+        investigationLight.gameObject.SetActive(false);
     }
 
     private IEnumerator ShakeCameraLightly()

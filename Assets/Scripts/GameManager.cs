@@ -195,7 +195,20 @@ public class GameManager : MonoBehaviour
                 currentCustomersPerDay = currentConfig.dayCustomerDatabase.Length;
 
                 if (CustomerManager.Instance != null)
-                    CustomerManager.Instance.SetTodayCustomers(currentConfig.dayCustomerDatabase);
+                {
+                    int playableCustomerCount = CustomerManager.Instance.SetTodayCustomers(
+                        currentConfig.dayCustomerDatabase,
+                        currentDay);
+                    if (playableCustomerCount > 0)
+                    {
+                        currentCustomersPerDay = playableCustomerCount;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Hari {currentDay} tidak memiliki customer dengan Product SO bergambar.");
+                        return;
+                    }
+                }
             }
         }
         
@@ -257,15 +270,8 @@ public class GameManager : MonoBehaviour
 
         if (!mustReject && activeProduct != null)
         {
-            NutriLevel expectedLevel;
-            if (activeProduct.TryCalculateNutriLevel(out expectedLevel))
-            {
-                isCorrect = (appliedLevel == expectedLevel);
-            }
-            else
-            {
-                Debug.LogError($"Produk '{activeProduct.namaProduk}' bukan minuman yang memenuhi syarat Nutri-Level Kemenkes 301/2026.");
-            }
+            NutriLevel expectedLevel = activeProduct.CalculateNutriLevel();
+            isCorrect = appliedLevel == expectedLevel;
         }
 
         HandleVerdictResult(isCorrect, false);

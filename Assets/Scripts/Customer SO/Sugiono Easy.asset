@@ -10,17 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff4227539419d0f489246393bf661894, type: 3}
-  m_Name: Netanyahu Easy
+  m_Name: Sugiono Easy
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
-  namaCustomer: Netanyahu Easy
+  namaCustomer: Sugiono Easy
   difficulty: 0
-  spriteNetral: {fileID: -7744603480918732714, guid: b4ade9299aaa4ad49a15d2219da2a271, type: 3}
+  spriteNetral: {fileID: -5738491721121520082, guid: e0db739d2359ccc418a8c9aad5178160, type: 3}
   spriteSenang: {fileID: 0}
-  spriteMarah: {fileID: 256885810310362222, guid: cff5ba9344404c448a6e7c208808c0f8, type: 3}
-  spriteCemas: {fileID: -7854956670836696326, guid: 92fc16596d778064fa38080b6b7611ea, type: 3}
+  spriteMarah: {fileID: -4989768394624673054, guid: c0226506df660fa47bb2e4d59abe6bf3, type: 3}
+  spriteCemas: {fileID: 5028372626281789768, guid: a13f9719fef6234409684085dc87eea7, type: 3}
+  spriteProtes: {fileID: 0}
   possibleProducts:
   - {fileID: 11400000, guid: bfb4d1f94a1204448b5e21f69a28b0a4, type: 2}
   - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
   canTriggerEvent: 1
   eventProbability: 0.05
   fungusMessageToTrigger: EventSuap_01
+  canAppeal: 1
+  fungusAppealMessage: EventBanding_01

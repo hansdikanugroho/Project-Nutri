@@ -10,26 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
-  m_Name: Yoghurt Diet Rasa Leci
+  m_Name: Keripik Kentang Keju
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
-  namaProduk: Yoghurt Diet Leci
-  asalProdusen: PT Susu Sehat
-  kategoriProduk: Minuman
-  jenisProdukNutri: 1
+  namaProduk: Keripik Kentang Keju
+  asalProdusen: UMKM Camilan Nusantara
+  kategoriProduk: Camilan
+  jenisProdukNutri: 0
   alamiTanpaGGL: 0
   gambarMakanan: {fileID: 0}
-  gula: 22
-  garam: 15
-  lemak: 0
-  jenisPemanis: 2
+  gula: 2
+  garam: 850
+  lemak: 15
+  jenisPemanis: 0
   levelSebenarnya: 3
   isPemalsuan: 0
-  kandunganBerbahaya:
-  dampakZatBerbahaya:
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
   levelZatBerbahaya: 0
   gulaAsli: 0
   garamAsli: 0
   lemakAsli: 0
   levelAsli: 0
-  fungusIntroMessage:
-  fungusFakeRevealMessage:
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 
