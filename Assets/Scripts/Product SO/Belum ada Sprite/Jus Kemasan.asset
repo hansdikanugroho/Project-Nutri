@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
-  m_Name: Jus Jeruk Kemasan Kotak
+  m_Name: Jus Kemasan
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
   namaProduk: Jus Kemasan
   asalProdusen: PT Sari Buah
@@ -24,8 +24,8 @@ MonoBehaviour:
   jenisPemanis: 1
   levelSebenarnya: 2
   isPemalsuan: 0
-  kandunganBerbahaya:
-  dampakZatBerbahaya:
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
   levelZatBerbahaya: 0
   wajibDitolak: 0
   adaZatTerlarang: 0
@@ -35,5 +35,5 @@ MonoBehaviour:
   lemakAsli: 0
   jenisPemanisAsli: 0
   levelAsli: 0
-  fungusIntroMessage:
-  fungusFakeRevealMessage:
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

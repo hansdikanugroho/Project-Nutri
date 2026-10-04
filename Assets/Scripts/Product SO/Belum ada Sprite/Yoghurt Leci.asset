@@ -10,22 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
-  m_Name: Air Mineral Pegunungan
+  m_Name: Yoghurt Leci
   m_EditorClassIdentifier: Assembly-CSharp::ProductData
-  namaProduk: Air Mineral
-  asalProdusen: Tirta Pegunungan
+  namaProduk: Yoghurt Leci
+  asalProdusen: PT Susu Sehat
   kategoriProduk: Minuman
-  jenisProdukNutri: 1
-  alamiTanpaGGL: 1
   gambarMakanan: {fileID: 0}
-  gula: 0
-  garam: 0
+  jenisProdukNutri: 1
+  alamiTanpaGGL: 0
+  gula: 22
+  garam: 15
   lemak: 0
-  jenisPemanis: 0
-  levelSebenarnya: 0
+  jenisPemanis: 2
+  levelSebenarnya: 3
   isPemalsuan: 0
-  kandunganBerbahaya:
-  dampakZatBerbahaya:
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
   levelZatBerbahaya: 0
   wajibDitolak: 0
   adaZatTerlarang: 0
@@ -35,5 +35,5 @@ MonoBehaviour:
   lemakAsli: 0
   jenisPemanisAsli: 0
   levelAsli: 0
-  fungusIntroMessage:
-  fungusFakeRevealMessage:
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

@@ -1,0 +1,468 @@
+fileFormatVersion: 2
+guid: a7b0f53070374fe4596d9dd3b78b26cc
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8506296733922605887
+    second: LOGO NUTRI INSPECTOR_0
+  - first:
+      213: -8685606059235312289
+    second: LOGO NUTRI INSPECTOR_1
+  - first:
+      213: 8453541280562710541
+    second: LOGO NUTRI INSPECTOR_2
+  - first:
+      213: 7871638565465567640
+    second: LOGO NUTRI INSPECTOR_3
+  - first:
+      213: -4693207692315434183
+    second: LOGO NUTRI INSPECTOR_4
+  - first:
+      213: -2091157836019595498
+    second: LOGO NUTRI INSPECTOR_5
+  - first:
+      213: -7562586477270326728
+    second: LOGO NUTRI INSPECTOR_6
+  - first:
+      213: 1143096306265104493
+    second: LOGO NUTRI INSPECTOR_7
+  - first:
+      213: 969777383738992345
+    second: LOGO NUTRI INSPECTOR_8
+  - first:
+      213: 7561085731190368181
+    second: LOGO NUTRI INSPECTOR_9
+  - first:
+      213: 4286333016819719384
+    second: LOGO NUTRI INSPECTOR_10
+  - first:
+      213: 5145450126751083578
+    second: LOGO NUTRI INSPECTOR_11
+  - first:
+      213: -4213581048908757038
+    second: LOGO NUTRI INSPECTOR_12
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 138
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c44a74503093f980800000000000000
+      internalID: -8506296733922605887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_1
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 69
+        width: 59
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5d7c44be47867780800000000000000
+      internalID: -8685606059235312289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_2
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 69
+        width: 57
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d088a028103015570800000000000000
+      internalID: 8453541280562710541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_3
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 69
+        width: 55
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89137dec19dad3d60800000000000000
+      internalID: 7871638565465567640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_4
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 70
+        width: 57
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 933686238706edeb0800000000000000
+      internalID: -4693207692315434183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_5
+      rect:
+        serializedVersion: 2
+        x: 406
+        y: 70
+        width: 16
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61707ce0707baf2e0800000000000000
+      internalID: -2091157836019595498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_6
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 24
+        width: 12
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 832212fcaab4c0790800000000000000
+      internalID: -7562586477270326728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_7
+      rect:
+        serializedVersion: 2
+        x: 174
+        y: 24
+        width: 33
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d602efeb8081ddf00800000000000000
+      internalID: 1143096306265104493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_8
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 24
+        width: 30
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d668f47467557d00800000000000000
+      internalID: 969777383738992345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_9
+      rect:
+        serializedVersion: 2
+        x: 237
+        y: 24
+        width: 30
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b760e3896f5ee860800000000000000
+      internalID: 7561085731190368181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_10
+      rect:
+        serializedVersion: 2
+        x: 268
+        y: 24
+        width: 28
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8dc51983b2d1c7b30800000000000000
+      internalID: 4286333016819719384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_11
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 23
+        width: 98
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3cac76e0af486740800000000000000
+      internalID: 5145450126751083578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LOGO NUTRI INSPECTOR_12
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 24
+        width: 29
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d7c97b4c5a5685c0800000000000000
+      internalID: -4213581048908757038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      LOGO NUTRI INSPECTOR_0: -8506296733922605887
+      LOGO NUTRI INSPECTOR_1: -8685606059235312289
+      LOGO NUTRI INSPECTOR_10: 4286333016819719384
+      LOGO NUTRI INSPECTOR_11: 5145450126751083578
+      LOGO NUTRI INSPECTOR_12: -4213581048908757038
+      LOGO NUTRI INSPECTOR_2: 8453541280562710541
+      LOGO NUTRI INSPECTOR_3: 7871638565465567640
+      LOGO NUTRI INSPECTOR_4: -4693207692315434183
+      LOGO NUTRI INSPECTOR_5: -2091157836019595498
+      LOGO NUTRI INSPECTOR_6: -7562586477270326728
+      LOGO NUTRI INSPECTOR_7: 1143096306265104493
+      LOGO NUTRI INSPECTOR_8: 969777383738992345
+      LOGO NUTRI INSPECTOR_9: 7561085731190368181
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
