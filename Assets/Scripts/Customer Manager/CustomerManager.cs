@@ -68,21 +68,6 @@ public class CustomerManager : MonoBehaviour
         return currentCustomer;
     }
 
-    public void ShowProtestVisual()
-    {
-        if (customerRenderer == null || currentCustomer == null) return;
-        customerRenderer.sprite = currentCustomer.spriteProtes != null ? currentCustomer.spriteProtes : currentCustomer.spriteMarah;
-    }
-
-    public void ReopenForAppeal()
-    {
-        hasInvestigated = false;
-        if (customerRenderer != null && currentCustomer != null)
-        {
-            customerRenderer.sprite = currentCustomer.spriteNetral;
-        }
-    }
-
     public void OnRejectButtonClicked()
     {
         if (GameManager.Instance != null)
@@ -434,16 +419,23 @@ public class CustomerManager : MonoBehaviour
         if (investigationNoir != null) investigationNoir.StopInvestigationInstant();
     }
 
-    public void EndCustomerSequence(bool isHappy)
+    public void EndCustomerSequence(bool isHappy, bool wasRejected = false, bool isCorrect = false)
     {
         StopInvestigationRoutine();
         StopRevealRoutine();
-        StartCoroutine(EndSequence(isHappy));
+        StartCoroutine(EndSequence(isHappy, wasRejected, isCorrect));
     }
 
-    private IEnumerator EndSequence(bool isHappy)
+    private IEnumerator EndSequence(bool isHappy, bool wasRejected, bool isCorrect)
     {
-        customerRenderer.sprite = isHappy ? currentCustomer.spriteSenang : currentCustomer.spriteMarah;
+        if (wasRejected)
+        {
+            customerRenderer.sprite = currentCustomer.spriteMarah;
+        }
+        else
+        {
+            customerRenderer.sprite = isHappy ? currentCustomer.spriteSenang : currentCustomer.spriteMarah;
+        }
         
         yield return new WaitForSeconds(1.5f); 
 
