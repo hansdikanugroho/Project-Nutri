@@ -511,17 +511,24 @@ public class CustomerManager : MonoBehaviour
         if (investigationNoir != null) investigationNoir.StopInvestigationInstant();
     }
 
-    public void EndCustomerSequence(bool isHappy)
+    public void EndCustomerSequence(bool isHappy, bool wasRejected = false, bool isCorrect = false)
     {
         HideHazardNotification();
         StopInvestigationRoutine();
         StopRevealRoutine();
-        StartCoroutine(EndSequence(isHappy));
+        StartCoroutine(EndSequence(isHappy, wasRejected, isCorrect));
     }
 
-    private IEnumerator EndSequence(bool isHappy)
+    private IEnumerator EndSequence(bool isHappy, bool wasRejected, bool isCorrect)
     {
-        customerRenderer.sprite = isHappy ? currentCustomer.GetHappySprite() : currentCustomer.GetAngrySprite();
+        if (wasRejected)
+        {
+            customerRenderer.sprite = currentCustomer.GetAngrySprite();
+        }
+        else
+        {
+            customerRenderer.sprite = isHappy ? currentCustomer.GetHappySprite() : currentCustomer.GetAngrySprite();
+        }
         
         yield return new WaitForSeconds(1.5f); 
 
