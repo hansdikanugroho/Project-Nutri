@@ -288,19 +288,19 @@ public class GameManager : MonoBehaviour
         float duration = 0.3f;
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             toastCanvasGroup.alpha = Mathf.Clamp01(elapsed / duration);
             yield return null;
         }
         toastCanvasGroup.alpha = 1f;
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSecondsRealtime(2f);
 
         elapsed = 0f;
         duration = 0.5f;
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             toastCanvasGroup.alpha = Mathf.Clamp01(1f - (elapsed / duration));
             yield return null;
         }
@@ -600,7 +600,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("[DEBUG EOD] spPopupPanel is NULL! Assign it in the Inspector to show the SP popup.");
         }
 
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSecondsRealtime(5f);
 
         if (spPopupPanel != null) spPopupPanel.SetActive(false);
 
@@ -894,7 +894,7 @@ public class GameManager : MonoBehaviour
             float y = originalBarPos.y + Random.Range(-1f, 1f) * shakeMagnitude;
 
             reputationBarRect.anchoredPosition = new Vector2(x, y);
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             yield return null; 
         }
 
@@ -903,16 +903,26 @@ public class GameManager : MonoBehaviour
 
     public void OnBribeAccepted()
     {
+        if (CustomerManager.Instance == null || !CustomerManager.Instance.TryCompletePendingEvent())
+        {
+            Debug.LogWarning("Callback suap diterima diabaikan karena tidak ada event customer yang sedang menunggu.");
+            return;
+        }
+
         Debug.LogWarning("Suap Diterima! Reputasi Anda turun sebagai bentuk risiko korupsi.");
-        dailyReputationChange -= 20; 
-        CustomerManager.Instance.ShowPaperAndStartTimer();
+        dailyReputationChange -= 20;
     }
 
     public void OnBribeRejected()
     {
+        if (CustomerManager.Instance == null || !CustomerManager.Instance.TryCompletePendingEvent())
+        {
+            Debug.LogWarning("Callback suap ditolak diabaikan karena tidak ada event customer yang sedang menunggu.");
+            return;
+        }
+
         Debug.Log("Suap Ditolak! Anda mempertahankan integritas pekerjaan Anda.");
-        dailyReputationChange += 5; 
-        CustomerManager.Instance.ShowPaperAndStartTimer();
+        dailyReputationChange += 5;
     }
 }
 

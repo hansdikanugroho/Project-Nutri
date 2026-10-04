@@ -10,7 +10,7 @@ public static class PaperRevealEffect
         if (label == null) yield break;
 
         label.text = "<s>" + oldValue + "</s>";
-        yield return new WaitForSeconds(strikeDelay);
+        yield return new WaitForSecondsRealtime(strikeDelay);
 
         label.text = string.Empty;
 
@@ -20,7 +20,7 @@ public static class PaperRevealEffect
         for (int i = 0; i < sb.Length; i++)
         {
             label.text = sb.ToString(0, i + 1);
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSecondsRealtime(delay);
         }
 
         label.text = newValue;
@@ -40,7 +40,7 @@ public static class PaperRevealEffect
             float offsetY = (Random.value * 2f - 1f) * magnitude * falloff;
             target.anchoredPosition = basePosition + new Vector2(offsetX, offsetY);
 
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             yield return null;
         }
 

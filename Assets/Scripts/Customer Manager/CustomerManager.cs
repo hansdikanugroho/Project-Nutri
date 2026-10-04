@@ -26,9 +26,19 @@ public class CustomerManager : MonoBehaviour
     private bool hasInvestigated = false;
     private Coroutine investigationRoutine;
     private Coroutine revealRoutine;
+    private Coroutine spawnRoutine;
+    private Coroutine eventWatchdogRoutine;
     private readonly List<Coroutine> revealChildren = new List<Coroutine>();
     private int revealRunning;
     private Vector2 shakeBasePosition;
+    private int customerSequenceVersion;
+    private bool paperShownForCurrentCustomer;
+    private bool waitingForFungusEvent;
+    private string pendingFungusMessage = string.Empty;
+
+    [Header("Event Safety")]
+    [Tooltip("Batas waktu nyata untuk menunggu callback event Fungus. Paper muncul otomatis jika event tidak pernah selesai.")]
+    [Min(1f)] public float eventResponseTimeout = 15f;
 
     [Header("Visual References")]
     public GameObject paperContainer;
@@ -109,9 +119,20 @@ public class CustomerManager : MonoBehaviour
 
     void Start()
     {
-        if (GameManager.Instance != null)
-            GameManager.Instance.SetHUDActive(true);
         if (foodObject != null) foodObject.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
+        StopPendingEventWatchdog();
+        StopSpawnRoutine();
+        StopInvestigationRoutine();
+        StopRevealRoutine();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 
     public int SetTodayCustomers(CustomerData[] customersForToday, int currentDay)
@@ -180,9 +201,12 @@ public class CustomerManager : MonoBehaviour
     public void ResetForNewDay()
     {
         HideHazardNotification();
+        StopPendingEventWatchdog();
+        StopSpawnRoutine();
         StopInvestigationRoutine();
         StopRevealRoutine();
         hasInvestigated = false;
+        paperShownForCurrentCustomer = false;
         currentCustomer = null;
         currentProduct = null;
 
@@ -208,11 +232,27 @@ public class CustomerManager : MonoBehaviour
 
     public void StartCustomerSequence()
     {
-        StartCoroutine(SpawnSequence());
+        bool isCurrentPaperActive = paperShownForCurrentCustomer
+            && GameManager.Instance != null
+            && GameManager.Instance.isProcessing;
+
+        if (spawnRoutine != null || waitingForFungusEvent || isCurrentPaperActive)
+        {
+            Debug.LogWarning("[CustomerManager] Permintaan spawn diabaikan karena customer sebelumnya masih aktif.");
+            return;
+        }
+
+        StopPendingEventWatchdog();
+        customerSequenceVersion++;
+        paperShownForCurrentCustomer = false;
+        spawnRoutine = StartCoroutine(SpawnSequence(customerSequenceVersion));
     }
 
-    private IEnumerator SpawnSequence()
+    private IEnumerator SpawnSequence(int sequenceVersion)
     {
+        // Pastikan field spawnRoutine sudah menerima handle coroutine sebelum jalur recovery dapat memulai sequence berikutnya.
+        yield return null;
+
         HideHazardNotification();
         if (paperContainer != null) paperContainer.SetActive(false);
         if (foodObject != null) foodObject.SetActive(false);
@@ -237,6 +277,16 @@ public class CustomerManager : MonoBehaviour
             if (currentProduct == null)
             {
                 Debug.LogError($"Customer '{currentCustomer.name}' tidak memiliki Product SO dengan sprite yang siap dimainkan.");
+                spawnRoutine = null;
+                RecoverFromBrokenCustomer();
+                yield break;
+            }
+
+            if (customerRenderer == null || customerObject == null)
+            {
+                Debug.LogError("[CustomerManager] Referensi customerObject/customerRenderer belum diisi. Customer dilewati agar game tidak stuck.");
+                spawnRoutine = null;
+                RecoverFromBrokenCustomer();
                 yield break;
             }
 
@@ -254,10 +304,16 @@ public class CustomerManager : MonoBehaviour
             float timeElapsed = 0f;
             while (timeElapsed < fadeInDuration)
             {
-                timeElapsed += Time.deltaTime;
+                timeElapsed += Time.unscaledDeltaTime;
                 cColor.a = Mathf.Lerp(0f, 1f, timeElapsed / fadeInDuration);
                 customerRenderer.color = cColor;
                 yield return null;
+            }
+
+            if (sequenceVersion != customerSequenceVersion)
+            {
+                spawnRoutine = null;
+                yield break;
             }
 
             // 3. Ensure alpha is exactly 1 at the end
@@ -272,33 +328,188 @@ public class CustomerManager : MonoBehaviour
 
             if (currentCustomer.canTriggerEvent && Random.value <= Mathf.Clamp01(eventProbability))
             {
-                Flowchart.BroadcastFungusMessage(currentCustomer.fungusMessageToTrigger);
-                yield break; 
+                spawnRoutine = null;
+                if (!TryStartFungusEvent(currentCustomer.fungusMessageToTrigger, sequenceVersion, "random customer event"))
+                {
+                    ShowPaperAndStartTimer();
+                }
+                yield break;
             }
 
             if (currentProduct != null && !string.IsNullOrEmpty(currentProduct.fungusIntroMessage))
             {
-                Flowchart.BroadcastFungusMessage(currentProduct.fungusIntroMessage);
+                spawnRoutine = null;
+                if (!TryStartFungusEvent(currentProduct.fungusIntroMessage, sequenceVersion, "product intro"))
+                {
+                    ShowPaperAndStartTimer();
+                }
             }
             else
             {
+                spawnRoutine = null;
                 ShowPaperAndStartTimer();
             }
         }
         else
         {
-            // Jika antrian habis, lapor ke GameManager untuk Akhiri Hari
-            Debug.Log("Semua pelanggan di database sudah dilayani. Hari berakhir.");
-            if (GameManager.Instance != null)
+            spawnRoutine = null;
+            Debug.LogError("[CustomerManager] Antrean customer kosong lebih awal. Slot dianggap selesai agar hari tidak stuck.");
+            if (GameManager.Instance != null) GameManager.Instance.CheckDayProgress();
+        }
+    }
+
+    private bool TryStartFungusEvent(string message, int sequenceVersion, string source)
+    {
+        string safeMessage = string.IsNullOrWhiteSpace(message) ? string.Empty : message.Trim();
+        if (string.IsNullOrEmpty(safeMessage))
+        {
+            Debug.LogWarning($"[CustomerManager] {source} tidak memiliki nama pesan Fungus. Melanjutkan langsung ke paper.");
+            return false;
+        }
+
+        MessageReceived[] receivers = FindObjectsByType<MessageReceived>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        bool hasValidReceiver = false;
+
+        for (int i = 0; i < receivers.Length; i++)
+        {
+            MessageReceived receiver = receivers[i];
+            if (receiver == null || !receiver.isActiveAndEnabled) continue;
+            if (!string.Equals(receiver.GetSummary(), safeMessage, System.StringComparison.Ordinal)) continue;
+
+            Block block = receiver.ParentBlock;
+            Flowchart flowchart = block != null ? block.GetFlowchart() : null;
+            if (block != null
+                && !block.IsExecuting()
+                && block._EventHandler == receiver
+                && flowchart != null
+                && flowchart.isActiveAndEnabled)
             {
-                // Panggil fungsi show panel result lu di sini
-                // GameManager.Instance.EndDay(); 
+                hasValidReceiver = true;
+                break;
             }
+        }
+
+        if (!hasValidReceiver)
+        {
+            Debug.LogWarning(
+                $"[CustomerManager] Pesan Fungus '{safeMessage}' dari {source} tidak mempunyai MessageReceived aktif yang cocok. " +
+                "Paper ditampilkan sebagai fallback agar game tidak stuck.");
+            return false;
+        }
+
+        StopPendingEventWatchdog();
+        waitingForFungusEvent = true;
+        pendingFungusMessage = safeMessage;
+        eventWatchdogRoutine = StartCoroutine(WatchFungusEvent(sequenceVersion, safeMessage));
+        Flowchart.BroadcastFungusMessage(safeMessage);
+        return true;
+    }
+
+    private IEnumerator WatchFungusEvent(int sequenceVersion, string message)
+    {
+        float timeout = Mathf.Max(1f, eventResponseTimeout);
+        float deadline = Time.realtimeSinceStartup + timeout;
+
+        while (Time.realtimeSinceStartup < deadline)
+        {
+            if (sequenceVersion != customerSequenceVersion || paperShownForCurrentCustomer || !waitingForFungusEvent)
+            {
+                eventWatchdogRoutine = null;
+                yield break;
+            }
+            yield return null;
+        }
+
+        eventWatchdogRoutine = null;
+        if (sequenceVersion != customerSequenceVersion || paperShownForCurrentCustomer) yield break;
+
+        Debug.LogError(
+            $"[CustomerManager] Event Fungus '{message}' tidak menyelesaikan callback dalam {timeout:0.#} detik. " +
+            "Event dihentikan dan paper ditampilkan otomatis.");
+        StopTimedOutFungusEvent(message);
+        ShowPaperAndStartTimer();
+    }
+
+    private static void StopTimedOutFungusEvent(string message)
+    {
+        MessageReceived[] receivers = FindObjectsByType<MessageReceived>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        for (int i = 0; i < receivers.Length; i++)
+        {
+            MessageReceived receiver = receivers[i];
+            if (receiver == null || !string.Equals(receiver.GetSummary(), message, System.StringComparison.Ordinal)) continue;
+
+            Block block = receiver.ParentBlock;
+            if (block != null && block.IsExecuting()) block.Stop();
+        }
+
+        if (MenuDialog.ActiveMenuDialog != null)
+        {
+            MenuDialog.ActiveMenuDialog.Clear();
+            MenuDialog.ActiveMenuDialog.SetActive(false);
+        }
+
+        if (SayDialog.ActiveSayDialog != null)
+        {
+            SayDialog.ActiveSayDialog.SetActive(false);
+        }
+    }
+
+    private void StopPendingEventWatchdog()
+    {
+        if (eventWatchdogRoutine != null)
+        {
+            StopCoroutine(eventWatchdogRoutine);
+            eventWatchdogRoutine = null;
+        }
+
+        waitingForFungusEvent = false;
+        pendingFungusMessage = string.Empty;
+    }
+
+    private void StopSpawnRoutine()
+    {
+        if (spawnRoutine == null) return;
+        StopCoroutine(spawnRoutine);
+        spawnRoutine = null;
+    }
+
+    private void RecoverFromBrokenCustomer()
+    {
+        currentCustomer = null;
+        currentProduct = null;
+        if (customerObject != null) customerObject.SetActive(false);
+        if (foodObject != null) foodObject.SetActive(false);
+        if (paperContainer != null) paperContainer.SetActive(false);
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CheckDayProgress();
         }
     }
 
     public void ShowPaperAndStartTimer()
     {
+        if (paperShownForCurrentCustomer)
+        {
+            Debug.LogWarning("[CustomerManager] Permintaan menampilkan paper kedua diabaikan.");
+            return;
+        }
+
+        if (currentCustomer == null || currentProduct == null)
+        {
+            Debug.LogError("[CustomerManager] Paper tidak dapat ditampilkan karena customer/product aktif tidak valid.");
+            return;
+        }
+
+        if (paperContainer == null)
+        {
+            Debug.LogError("[CustomerManager] Referensi paperContainer kosong. Customer dilewati agar game tidak stuck.");
+            RecoverFromBrokenCustomer();
+            return;
+        }
+
+        paperShownForCurrentCustomer = true;
+        StopPendingEventWatchdog();
         HideHazardNotification();
         StopInvestigationRoutine();
         hasInvestigated = false;
@@ -335,12 +546,39 @@ public class CustomerManager : MonoBehaviour
         }
         SetPaperTextVisible(true);
 
+        if (!paperContainer.activeInHierarchy)
+        {
+            Debug.LogError("[CustomerManager] Paper aktif tetapi parent/Canvas-nya nonaktif. Customer dilewati agar game tidak stuck.");
+            paperShownForCurrentCustomer = false;
+            RecoverFromBrokenCustomer();
+            return;
+        }
+
         if (audioSource != null && paperSpawnSFX != null)
         {
             audioSource.PlayOneShot(paperSpawnSFX);
         }
         
-        GameManager.Instance.OnCustomerReady(currentProduct);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCustomerReady(currentProduct);
+        }
+        else
+        {
+            Debug.LogError("[CustomerManager] GameManager tidak tersedia saat paper ditampilkan.");
+        }
+    }
+
+    public bool TryCompletePendingEvent()
+    {
+        if (!waitingForFungusEvent || paperShownForCurrentCustomer)
+        {
+            Debug.LogWarning($"[CustomerManager] Callback event '{pendingFungusMessage}' diabaikan karena event sudah selesai atau tidak lagi aktif.");
+            return false;
+        }
+
+        ShowPaperAndStartTimer();
+        return paperShownForCurrentCustomer;
     }
 
     public void OnInvestigateButtonClicked()
@@ -527,7 +765,7 @@ public class CustomerManager : MonoBehaviour
             customerRenderer.sprite = isHappy ? currentCustomer.GetHappySprite() : currentCustomer.GetAngrySprite();
         }
         
-        yield return new WaitForSeconds(1.5f); 
+        yield return new WaitForSecondsRealtime(1.5f);
 
         float fadeDuration = 1f;
         float timeElapsed = 0f;
@@ -536,7 +774,7 @@ public class CustomerManager : MonoBehaviour
 
         while (timeElapsed < fadeDuration)
         {
-            timeElapsed += Time.deltaTime;
+            timeElapsed += Time.unscaledDeltaTime;
             float alpha = Mathf.Lerp(1f, 0f, timeElapsed / fadeDuration);
 
             cColor.a = alpha;
@@ -553,9 +791,9 @@ public class CustomerManager : MonoBehaviour
             yield return null;
         }
 
-        customerObject.SetActive(false); 
+        if (customerObject != null) customerObject.SetActive(false);
         if (foodObject != null) foodObject.SetActive(false); 
-        paperContainer.SetActive(false); 
+        if (paperContainer != null) paperContainer.SetActive(false);
         
         SetPaperTextVisible(false);
 
@@ -563,7 +801,10 @@ public class CustomerManager : MonoBehaviour
             GameManager.Instance.SetHUDActive(true);
 
         // Setelah bersih-bersih, suruh GameManager memanggil pelanggan berikutnya
-        GameManager.Instance.CheckDayProgress();
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CheckDayProgress();
+        }
     }
 
     private void ResetFadeColors()
