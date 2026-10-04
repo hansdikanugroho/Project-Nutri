@@ -19,9 +19,15 @@ MonoBehaviour:
   spriteMarah: {fileID: 256885810310362222, guid: cff5ba9344404c448a6e7c208808c0f8, type: 3}
   spriteCemas: {fileID: -7854956670836696326, guid: 92fc16596d778064fa38080b6b7611ea, type: 3}
   possibleProducts:
-  - {fileID: 11400000, guid: bfb4d1f94a1204448b5e21f69a28b0a4, type: 2}
-  - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
-  - {fileID: 11400000, guid: e60d73dd3686de6449f2a250cc682b37, type: 2}
+  - {fileID: 11400000, guid: 8f710d9160354d6c853515e7d39149c1, type: 2}
+  - {fileID: 11400000, guid: e4ec64ed55104eb8b1a003b9cfbeba80, type: 2}
+  - {fileID: 11400000, guid: e8bb0102a60b42ba9b0217d42c2e0c06, type: 2}
+  - {fileID: 11400000, guid: 6ef30ce9a9b74d90a9fd8eedba139fa1, type: 2}
+  - {fileID: 11400000, guid: a9d9b5a60b334d948165b6d21b22dc75, type: 2}
+  - {fileID: 11400000, guid: f9343535ab4945a0be303f29f2c5738b, type: 2}
+  - {fileID: 11400000, guid: ad006e22fdef4120aa086a97663c7dce, type: 2}
+  - {fileID: 11400000, guid: 5f71128787ea42ad997f5693f5875dcf, type: 2}
+  - {fileID: 11400000, guid: 34ae64a2357443e3a53688bd9ea16e4c, type: 2}
   canTriggerEvent: 1
   eventProbability: 0.2
   fungusMessageToTrigger: EventSuap_01

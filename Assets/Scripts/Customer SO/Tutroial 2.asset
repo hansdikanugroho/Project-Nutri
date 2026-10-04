@@ -19,7 +19,7 @@ MonoBehaviour:
   spriteCemas: {fileID: -7854956670836696326, guid: 92fc16596d778064fa38080b6b7611ea, type: 3}
   spriteProtes: {fileID: -7854956670836696326, guid: 92fc16596d778064fa38080b6b7611ea, type: 3}
   possibleProducts:
-  - {fileID: 11400000, guid: dd9d55199600eff4bad2017be90c21e4, type: 2}
+  - {fileID: 11400000, guid: e8bb0102a60b42ba9b0217d42c2e0c06, type: 2}
   canTriggerEvent: 0
   eventProbability: 0.2
   fungusMessageToTrigger: EventSuap_01

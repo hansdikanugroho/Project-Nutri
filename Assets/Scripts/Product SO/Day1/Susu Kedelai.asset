@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
+  m_Name: Susu Kedelai
+  m_EditorClassIdentifier: Assembly-CSharp::ProductData
+  namaProduk: Susu Kedelai
+  asalProdusen: Sari Kedelai
+  kategoriProduk: Minuman
+  gambarMakanan: {fileID: -4363279584271792367, guid: 992dce581556f284e9b3cc1bb22f8d65, type: 3}
+  jenisProdukNutri: 1
+  alamiTanpaGGL: 0
+  gula: 4
+  garam: 45
+  lemak: 0.8
+  jenisPemanis: 1
+  levelSebenarnya: 1
+  isPemalsuan: 0
+  kandunganBerbahaya: 
+  dampakZatBerbahaya: 
+  levelZatBerbahaya: 0
+  wajibDitolak: 0
+  adaZatTerlarang: 0
+  penaltiTolakSalah: 15
+  gulaAsli: 0
+  garamAsli: 0
+  lemakAsli: 0
+  jenisPemanisAsli: 0
+  levelAsli: 0
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: 

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73740adc0da7b3e498556dd097a8ec0c, type: 3}
+  m_Name: Mie Lidi
+  m_EditorClassIdentifier: Assembly-CSharp::ProductData
+  namaProduk: Mie Lidi
+  asalProdusen: UMKM Nusantara
+  kategoriProduk: Camilan
+  gambarMakanan: {fileID: -4026503044375602582, guid: 9d56010d65743d746929e883474925ea, type: 3}
+  jenisProdukNutri: 0
+  alamiTanpaGGL: 0
+  gula: 2
+  garam: 850
+  lemak: 6
+  jenisPemanis: 0
+  levelSebenarnya: 3
+  isPemalsuan: 0
+  kandunganBerbahaya: Boraks
+  dampakZatBerbahaya: Gangguan pencernaan dan ginjal
+  levelZatBerbahaya: 2
+  wajibDitolak: 1
+  adaZatTerlarang: 1
+  penaltiTolakSalah: 15
+  gulaAsli: 0
+  garamAsli: 0
+  lemakAsli: 0
+  jenisPemanisAsli: 0
+  levelAsli: 0
+  fungusIntroMessage: 
+  fungusFakeRevealMessage: Reveal_Boraks

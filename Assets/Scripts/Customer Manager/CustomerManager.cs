@@ -16,8 +16,8 @@ public class CustomerManager : MonoBehaviour
     public DayNightController timeController; 
 
     [Header("Difficulty Progression")]
-    [Min(1)] public int lastEasyDay = 7;
-    [Min(2)] public int lastNormalDay = 15;
+    [Tooltip("Jumlah hari per tier: 7 = minggu 1 Easy, minggu 2 Normal, minggu 3 Hard.")]
+    [Min(1)] public int daysPerDifficultyTier = 7;
     private List<CustomerData> dailyCustomerQueue = new List<CustomerData>();
     private int totalCustomersToday;
 
@@ -152,12 +152,9 @@ public class CustomerManager : MonoBehaviour
 
     public CustomerDifficulty GetDifficultyForDay(int day)
     {
-        int easyLimit = Mathf.Max(1, lastEasyDay);
-        int normalLimit = Mathf.Max(easyLimit + 1, lastNormalDay);
-
-        if (day <= easyLimit) return CustomerDifficulty.Easy;
-        if (day <= normalLimit) return CustomerDifficulty.Normal;
-        return CustomerDifficulty.Hard;
+        int tierLength = Mathf.Max(1, daysPerDifficultyTier);
+        int tierIndex = Mathf.Clamp((Mathf.Max(1, day) - 1) / tierLength, 0, 2);
+        return (CustomerDifficulty)tierIndex;
     }
 
     public void GenerateDailyQueue()

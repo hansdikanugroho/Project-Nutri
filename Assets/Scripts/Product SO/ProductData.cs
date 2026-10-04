@@ -19,8 +19,8 @@ public class ProductData : ScriptableObject
     [Tooltip("Aktifkan untuk minuman yang secara alami tidak mengandung gula, garam, dan lemak sehingga tidak mencantumkan Nutri-Level.")]
     public bool alamiTanpaGGL;
 
-    [Header("Kandungan minuman per 100 mL")]
-    [Tooltip("Monosakarida dan disakarida yang diperhitungkan, tidak termasuk laktosa.")]
+    [Header("Kandungan GGL (minuman/100 mL; padat/100 g)")]
+    [Tooltip("Untuk minuman: monosakarida dan disakarida per 100 mL, tidak termasuk laktosa. Untuk makanan padat: data gameplay per 100 g.")]
     [Min(0f)] public float gula;
     [Tooltip("Kandungan garam dalam miligram per 100 mL.")]
     [Min(0f)] public float garam;
@@ -66,6 +66,13 @@ public class ProductData : ScriptableObject
     {
         level = CalculateNutriLevel();
         return CanReceiveNutriLevel();
+    }
+
+    public NutriLevel GetGameplayLevel()
+    {
+        // Kepmenkes 301/2026 menghitung otomatis hanya minuman siap saji.
+        // Makanan padat memakai levelSebenarnya yang disusun sebagai data gameplay.
+        return CanReceiveNutriLevel() ? CalculateNutriLevel() : levelSebenarnya;
     }
 
     public NutriLevel CalculateTrueNutriLevel()
